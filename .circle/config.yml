@@ -1,0 +1,20 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: circleci/node:latest
+    steps:
+      - checkout
+      - run:
+          name: "Checking Versions"
+          command: |
+            node --version
+            npm --version
+            yarn --version
+      - run:
+          name: "Install dependencies"
+          command: yarn install
+      - run:
+          name: "Run tests"
+          command: yarn test

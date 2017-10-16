@@ -1,0 +1,51 @@
+/* 8 pt grid */
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto';
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+/* Table overrides*/
+.ReactVirtualized__Table {
+  background-color: white;
+  border-bottom: 1px solid #d2d2d2;
+  font-weight: 100;
+}
+
+.ReactVirtualized__Table__headerColumn:first-of-type, .ReactVirtualized__Table__rowColumn:first-of-type {
+  margin-left: 0;
+}
+
+.ReactVirtualized__Table__headerRow {
+  padding-left: 4rem;
+  border-bottom: 1px solid #d2d2d2;
+  border-top: 1px solid #d2d2d2;
+  border-left: 1px solid #d2d2d2;
+  border-right: 1px solid #d2d2d2;
+  font-weight: 500;
+  background-color: #F7F9FC;
+  color: #34445A;
+}
+
+.ReactVirtualized__Table__row {
+  padding-left: 4rem;
+  border-bottom: 1px solid #d2d2d2;
+  border-left: 1px solid #d2d2d2;
+  border-right: 1px solid #d2d2d2;
+  background-color: #ffffff;
+  margin-bottom: 30px;
+}
+.ReactVirtualized__Table__row:hover {
+  box-shadow: 0 .2em 1em rgba(0,0,0,0.1);
+  transition: all .3s;
+  background-color: #f5f5f5;
+}
