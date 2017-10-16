@@ -17,6 +17,7 @@
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
+    "deploy": "npm run build && surge build conduit-ui.surge.sh",    
     "eject": "react-scripts-ts eject",
     "prettier": "prettier --single-quote --print-width 100 --trailing-comma es5 --write 'src/**/*.tsx'"
   },

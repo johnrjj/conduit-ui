@@ -21,7 +21,10 @@ import 'react-vis/dist/style.css';
 const logo = require('./assets/icons/conduit-white.svg');
 const exchange = require('./assets/icons/exchange-black.svg');
 
-const WS_ENDPOINT = 'ws://localhost:3001/ws';
+const WS_ENDPOINT =
+  process.env.NODE_ENV === 'development'
+    ? 'ws://localhost:3001/ws'
+    : 'ws://0x-relayer-api.now.sh/ws';
 
 export interface AppProps {}
 export interface AppState {

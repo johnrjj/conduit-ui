@@ -2,6 +2,16 @@ import styled from 'styled-components';
 import * as React from 'react';
 import colors from '../util/colors';
 
+const SidePanel = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-basis: 20rem;
+  flex-shrink: 2;
+  min-width: 12rem;
+  max-width: 20rem;
+  border-left: 1px solid ${colors.greyWithBlueHue};
+`;
+
 const SidePanelHeader = styled.div`
   display: flex;
   align-items: center;
@@ -15,14 +25,6 @@ const SidePanelHeader = styled.div`
   border-bottom: 1px solid ${colors.greyWithBlueHue};
   font-weight: 100;
   background: #e6ebf1;
-`;
-
-const SidePanel = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex-basis: 20rem;
-  max-width: 20rem;
-  border-left: 1px solid ${colors.greyWithBlueHue};
 `;
 
 const SidePanelContent = styled.div`

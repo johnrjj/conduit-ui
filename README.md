@@ -3,6 +3,8 @@
 [![CircleCI](https://circleci.com/gh/johnrjj/conduit-ui.svg?style=svg)](https://circleci.com/gh/johnrjj/conduit-ui/)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
+[Demo](https://conduit-ui.surge.sh)
+
 ## Overview
 
 Monitors Conduit (Open Source 0x Relayer) nodes. Written in React, TypeScript, and styled-components.

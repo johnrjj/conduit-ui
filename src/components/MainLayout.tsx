@@ -18,6 +18,7 @@ const AppContent = styled.div`
 const MainPanel = styled.div`
   display: flex;
   flex: 1;
+  flex-basis: 40rem;
   flex-direction: column;
   margin: 0 2rem 0 4rem;
 `;
