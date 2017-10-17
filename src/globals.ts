@@ -1,4 +1,8 @@
 declare module "mock-socket" {
-  var _tmp: any;
-  export = _tmp;
+  var WebSocket: any, Server: any, SocketIO: any
+  export {
+    WebSocket,
+    Server,
+    SocketIO,
+  }
 }
