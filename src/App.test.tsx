@@ -1,10 +1,8 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import App from './App';
-import { WebSocket, Server, SocketIO } from 'mock-socket';
 
-declare var global: any;
-global.WebSocket= WebSocket
+import * as mockSocket from 'mock-socket';
 
 it('renders without crashing', () => {
   const div = document.createElement('div');
