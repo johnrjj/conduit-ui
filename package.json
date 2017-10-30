@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "0x.js": "^0.21.4",
+    "0x.js": "^0.22.0",
     "date-fns": "^1.29.0",
     "mock-socket": "^7.0.0",
     "prettier": "^1.7.4",
