@@ -8,9 +8,9 @@
   dependencies:
     jsonschema "^1.2.0"
 
-"0x.js@^0.21.4":
-  version "0.21.4"
-  resolved "https://registry.yarnpkg.com/0x.js/-/0x.js-0.21.4.tgz#dab2fda39cc150d95d4eaba607b9f77ed15a3d47"
+"0x.js@^0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/0x.js/-/0x.js-0.22.0.tgz#323ffba85eaf0c9f995a64a97995595000ba6191"
   dependencies:
     "0x-json-schemas" "^0.6.1"
     "@types/bignumber.js" "^4.0.2"

@@ -37,17 +37,18 @@ export const TableFlexGrow = styled.div`
   flex: 1;
 `;
 
-export class TradeTable extends React.Component {
-  constructor(props: { data: any }) {
+export class TradeTable extends React.Component<any, any> {
+  constructor(props: { orders: any }) {
     super(props);
     this._getDatum = this._getDatum.bind(this);
     this.state = {};
   }
 
   render() {
+    // const { data } = this.props;
+    console.log(data);
     const rowGetter = ({ index }: { index: number }) => this._getDatum(data, index);
-    const rowCount = data.length;
-
+    const rowCount = (data && data.length) || 0;
     return (
       <AutoSizer>
         {({ width, height }) => (
@@ -81,7 +82,7 @@ export class TradeTable extends React.Component {
 
             <Column
               label="EXCHANGE RATE"
-              cellDataGetter={({ rowData }) => rowData.exchange}
+              cellDataGetter={({ rowData }) => rowData.makerTokenAmount}
               cellRenderer={({ cellData }) => cellData}
               dataKey="exchange"
               width={120}
