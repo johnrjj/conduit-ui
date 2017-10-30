@@ -6,8 +6,6 @@ export interface TimeSinceProps {
   date?: Date;
 }
 
-interface Fetcher {}
-
 export class TimeSince extends React.Component<TimeSinceProps, any> {
   interval?: number;
 
