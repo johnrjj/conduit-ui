@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Component } from 'react';
 import styled from 'styled-components';
+import { BigNumber } from 'bignumber.js';
+import { ZeroEx } from '0x.js';
 import { AppContainer, AppContent, MainPanel, ContentHeader } from './components/MainLayout';
 import { TradeTable, TableFlexGrow } from './components/TradeTable';
 import { AppHeader } from './components/Header';
@@ -20,6 +22,9 @@ import { LoadingPlaceholder } from './components/Loading';
 import { WS } from './components/WebSocket';
 const logo = require('./assets/icons/conduit-white.svg');
 const exchange = require('./assets/icons/exchange-black.svg');
+BigNumber.config({
+  EXPONENTIAL_AT: 1000,
+});
 
 const API_ENDPOINT_ROOT =
   process.env.NODE_ENV === 'development'
@@ -43,6 +48,10 @@ export interface AppState {
   orders: Array<any>;
   recentFills: Array<any>;
 }
+
+ZeroEx.toBaseUnitAmount(new BigNumber(1212), 18);
+ZeroEx.toUnitAmount(new BigNumber('12121212'), 18);
+
 
 class App extends Component<AppProps, AppState> {
   ws: WS | null;
@@ -154,6 +163,21 @@ class App extends Component<AppProps, AppState> {
 }
 
 export default App;
+
+
+// @keyframes highlight {
+//   0% {
+//     background: red
+//   }
+//   100% {
+//     background: none;
+//   }
+// }
+
+// #highlight:target {
+//   animation: highlight 1s;
+// }
+
 
 // interface Order {
 //   type: string;

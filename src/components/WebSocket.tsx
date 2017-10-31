@@ -28,7 +28,9 @@ export class WS extends Component<WSProps, WSState> {
 
   send = (data: any) => this.state.ws.send(data);
 
-  private handleWebSocketSetup = () => {
+  reconnect = () => this.handleWebSocketSetup();
+
+  private handleWebSocketSetup() {
     const ws = new WebSocket(this.props.url);
     ws.onopen = event => this.props.onOpen && this.props.onOpen(event);
     ws.onmessage = event => this.props.onMessage && this.props.onMessage(event);

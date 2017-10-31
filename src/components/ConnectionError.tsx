@@ -41,7 +41,7 @@ const ConnectionError = () => (
     <DisconnectedTitle>Conduit not connected</DisconnectedTitle>
     <DisconnectedDescription>No live connection to a Conduit detected</DisconnectedDescription>
     <DisconnectedDescription>
-      Make sure your Conduit server is running and the UI is pointed at the right endpoint
+      Make sure your Conduit server is running at the correct URL
     </DisconnectedDescription>
   </CenterHorizAndVert>
 );
