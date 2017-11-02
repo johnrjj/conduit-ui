@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import colors from '../util/colors';
 
-const AppFooter = styled.div`
+const AppFooter = styled.footer`
   display: flex;
   display: flex;
   flex-direction: row;

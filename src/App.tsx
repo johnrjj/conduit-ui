@@ -3,6 +3,7 @@ import { Component } from 'react';
 import styled from 'styled-components';
 import { BigNumber } from 'bignumber.js';
 import { ZeroEx } from '0x.js';
+import { RBTree } from 'bintrees';
 import { AppContainer, AppContent, MainPanel, ContentHeader } from './components/MainLayout';
 import { TradeTable, TableFlexGrow } from './components/TradeTable';
 import { AppHeader } from './components/Header';
@@ -26,13 +27,49 @@ BigNumber.config({
   EXPONENTIAL_AT: 1000,
 });
 
+import { subHours, subMinutes, subDays, distanceInWordsToNow } from 'date-fns';
+
+const dateFiveHoursAgo = subHours(new Date(), 5);
+const dateTenMinutesAgo = subMinutes(new Date(), 10);
+const dateTwoDaysAgo = subDays(new Date(), 2);
+
+ZeroEx.toBaseUnitAmount(new BigNumber(1212), 18);
+ZeroEx.toUnitAmount(new BigNumber('12121212'), 18);
+
+const data = [
+  {
+    index: 0,
+    maker: ZeroEx.toUnitAmount(new BigNumber(10000000000000000000000), 18).toString(),
+    taker: ZeroEx.toBaseUnitAmount(new BigNumber(1000), 18).toString(),
+    exchange: '1 ZRX / 1.3 MKR',
+    date: dateTenMinutesAgo,
+  },
+  {
+    index: 1,
+    maker: '1 WETH',
+    taker: '10.00000 DGB',
+    exchange: '1 WETH / 10 DGB',
+    date: dateFiveHoursAgo,
+  },
+  {
+    index: 2,
+    maker: '7.14 ZRX',
+    taker: '10.100 MKR',
+    exchange: '1 ZRX / 1.3 MKR',
+    date: dateTwoDaysAgo,
+  },
+];
+
+// https://dribbble.com/shots/3907247-CL-Overview-UI
+// https://dribbble.com/shots/3914200-Web-operation-steps
+
 const API_ENDPOINT_ROOT =
-  process.env.NODE_ENV === 'development'
+  process.env.NODE_ENV === '!development'
     ? 'http://localhost:3001/api/v0'
     : 'https://conduit-relay.herokuapp.com/api/v0';
 
 const WS_ENDPOINT =
-  process.env.NODE_ENV === 'development'
+  process.env.NODE_ENV === '!development'
     ? 'ws://localhost:3001/ws'
     : 'wss://conduit-relay.herokuapp.com/ws';
 
@@ -41,17 +78,31 @@ const tokenPairToWatch = {
   quoteToken: '0x1dad4783cf3fe3085c1426157ab175a6119a04ba',
 };
 
+const getTokens = async () => {
+  const res = await fetch(`${API_ENDPOINT_ROOT}/tokens`);
+  const json = res.json();
+  return json;
+}
+
+const getTokenPairs = async () => {
+  const res = await fetch(`${API_ENDPOINT_ROOT}/token_pairs`);
+  const json = res.json();
+  return json;
+}
+
 export interface AppProps {}
 export interface AppState {
   connectionStatus: 'connected' | 'disconnected' | 'loading';
-  lastUpdated?: Date;
-  orders: Array<any>;
+  lastWebSocketUpdate?: Date;
+  bids: RBTree<any>;
+  asks: RBTree<any>;
   recentFills: Array<any>;
+  tokens: Array<any>;
+  tokenPairs: Array<any>;
 }
 
 ZeroEx.toBaseUnitAmount(new BigNumber(1212), 18);
 ZeroEx.toUnitAmount(new BigNumber('12121212'), 18);
-
 
 class App extends Component<AppProps, AppState> {
   ws: WS | null;
@@ -59,38 +110,77 @@ class App extends Component<AppProps, AppState> {
     super();
     this.state = {
       connectionStatus: 'loading',
-      orders: [],
+      bids: new RBTree((a, b) => 1),
+      asks: new RBTree((a, b) => -1),
       recentFills: [],
+      tokens: [],
+      tokenPairs: [],
     };
-    this.handleSocketOpen = this.handleSocketOpen.bind(this);
-    this.handleSocketMessage = this.handleSocketMessage.bind(this);
-    this.handleSocketError = this.handleSocketError.bind(this);
-    this.handleSocketClose = this.handleSocketClose.bind(this);
   }
 
-  handleSocketOpen() {
-    this.setState({ lastUpdated: new Date(), connectionStatus: 'connected' });
+  async componentDidMount() {
+    await this.loadTokensAndTokenPairs();
+  }
+
+  async loadTokensAndTokenPairs() {
+    const tokens = await getTokenPairs();
+    const tokenPairs = await getTokens();
+    this.setState({
+      tokens,
+      tokenPairs,
+    });
+  }
+
+  handleSocketOpen = () => {
+    this.setState({ lastWebSocketUpdate: new Date(), connectionStatus: 'connected' });
     this.subscribeToRelayerWebSocketFeed(tokenPairToWatch.baseToken, tokenPairToWatch.quoteToken);
   }
 
-  handleSocketMessage(msg: MessageEvent) {
-    this.setState({ lastUpdated: new Date() });
-    console.log(msg.data);
-    console.log(JSON.parse(msg.data));
+  handleSocketMessage = (msg: MessageEvent) => {
+    this.setState({ lastWebSocketUpdate: new Date() });
+    console.log('Received message from Conduit WebSocket server', msg.data);
+    const event = JSON.parse(msg.data);
+    switch (event.channel) {
+      case 'orderbook':
+        console.log('got an orderbook event');
+        this.handleOrderbookEvent(event);
+      default: 
+        console.log('default', event);
+    }
   }
 
-  handleSocketClose() {
-    this.setState({ lastUpdated: undefined, connectionStatus: 'disconnected' });
+  handleSocketClose = () => {
+    this.setState({ lastWebSocketUpdate: undefined, connectionStatus: 'disconnected' });
     console.log('close');
   }
 
-  handleSocketError(err: any) {
+  handleSocketError = (err: any) => {
     console.error('Error with relay websocket', err);
   }
 
+  private handleOrderbookEvent(orderbookEvent) {
+    switch (orderbookEvent.type) {
+      case 'snapshot':
+        console.log('got a snapshot orderbook event', orderbookEvent);
+      case 'update':
+        // right now updates are only new orders
+      const newOrder = orderbookEvent.payload;
+      this.setState((prevState) => ({
+          orders: [...prevState.orders, newOrder]
+        })
+      );
+
+        console.log('got a update orderbook event', orderbookEvent);
+      case 'fill':
+        // remember this is nonstandard api spec
+        console.log('got a fill orderbook event', orderbookEvent);
+      default:
+        console.log('unrecognized orderbook event', orderbookEvent);
+    }
+  }
+
   render() {
-    const { lastUpdated, connectionStatus } = this.state;
-    // const signedOrders = orders.map(o => o.signedOrder);
+    const { lastWebSocketUpdate, connectionStatus } = this.state;
     return (
       <AppContainer>
         <WS
@@ -113,7 +203,7 @@ class App extends Component<AppProps, AppState> {
             <MainPanel>
               <ContentHeader>Open Orders</ContentHeader>
               <TableFlexGrow>
-                <TradeTable data={null} />
+                <TradeTable data={data} />
               </TableFlexGrow>
             </MainPanel>
             <SidePanel>
@@ -130,7 +220,7 @@ class App extends Component<AppProps, AppState> {
         )}
         <AppFooter>
           <TimeSince
-            date={lastUpdated}
+            date={lastWebSocketUpdate}
             formatter={timeSince => (timeSince ? `Last updated ${timeSince}` : 'Disconnected')}
           />
         </AppFooter>

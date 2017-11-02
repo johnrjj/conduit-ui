@@ -7,30 +7,6 @@ const dateFiveHoursAgo = subHours(new Date(), 5);
 const dateTenMinutesAgo = subMinutes(new Date(), 10);
 const dateTwoDaysAgo = subDays(new Date(), 2);
 
-const data = [
-  {
-    index: 0,
-    maker: '7.14 ZRX',
-    taker: '10.100 MKR',
-    exchange: '1 ZRX / 1.3 MKR',
-    date: dateTenMinutesAgo,
-  },
-  {
-    index: 1,
-    maker: '1 WETH',
-    taker: '10.00000 DGB',
-    exchange: '1 WETH / 10 DGB',
-    date: dateFiveHoursAgo,
-  },
-  {
-    index: 2,
-    maker: '7.14 ZRX',
-    taker: '10.100 MKR',
-    exchange: '1 ZRX / 1.3 MKR',
-    date: dateTwoDaysAgo,
-  },
-];
-
 export const TableFlexGrow = styled.div`
   position: relative;
   display: flex;
@@ -45,7 +21,7 @@ export class TradeTable extends React.Component<any, any> {
   }
 
   render() {
-    // const { data } = this.props;
+    const { data } = this.props;
     console.log(data);
     const rowGetter = ({ index }: { index: number }) => this._getDatum(data, index);
     const rowCount = (data && data.length) || 0;
