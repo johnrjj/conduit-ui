@@ -37,5 +37,5 @@ export class WS extends Component<WSProps, WSState> {
     ws.onerror = error => this.props.onError && this.props.onError(error);
     ws.onclose = close => this.props.onClose && this.props.onClose(close);
     this.setState({ ws });
-  };
+  }
 }

@@ -7,6 +7,7 @@ import { RBTree } from 'bintrees';
 import { AppContainer, AppContent, MainPanel, ContentHeader } from './components/MainLayout';
 import { TradeTable, TableFlexGrow } from './components/TradeTable';
 import { AppHeader } from './components/Header';
+import { ZeroExFeed } from './components/ZeroExFeed';
 import {
   SidePanel,
   SidePanelHeader,
@@ -82,13 +83,13 @@ const getTokens = async () => {
   const res = await fetch(`${API_ENDPOINT_ROOT}/tokens`);
   const json = res.json();
   return json;
-}
+};
 
 const getTokenPairs = async () => {
   const res = await fetch(`${API_ENDPOINT_ROOT}/token_pairs`);
   const json = res.json();
   return json;
-}
+};
 
 export interface AppProps {}
 export interface AppState {
@@ -105,7 +106,7 @@ ZeroEx.toBaseUnitAmount(new BigNumber(1212), 18);
 ZeroEx.toUnitAmount(new BigNumber('12121212'), 18);
 
 class App extends Component<AppProps, AppState> {
-  ws: WS | null;
+  feed: ZeroExFeed | null;
   constructor() {
     super();
     this.state = {
@@ -133,8 +134,8 @@ class App extends Component<AppProps, AppState> {
 
   handleSocketOpen = () => {
     this.setState({ lastWebSocketUpdate: new Date(), connectionStatus: 'connected' });
-    this.subscribeToRelayerWebSocketFeed(tokenPairToWatch.baseToken, tokenPairToWatch.quoteToken);
-  }
+    // this.subscribeToRelayerWebSocketFeed(tokenPairToWatch.baseToken, tokenPairToWatch.quoteToken);
+  };
 
   handleSocketMessage = (msg: MessageEvent) => {
     this.setState({ lastWebSocketUpdate: new Date() });
@@ -144,54 +145,46 @@ class App extends Component<AppProps, AppState> {
       case 'orderbook':
         console.log('got an orderbook event');
         this.handleOrderbookEvent(event);
-      default: 
+      default:
         console.log('default', event);
     }
-  }
+  };
 
   handleSocketClose = () => {
     this.setState({ lastWebSocketUpdate: undefined, connectionStatus: 'disconnected' });
     console.log('close');
-  }
+  };
 
   handleSocketError = (err: any) => {
     console.error('Error with relay websocket', err);
+  };
+
+  handleOrderbookUpdate(orderbookUpdate) {
+    // const newOrder = orderbookEvent.payload;
+    // this.setState((prevState) => ({
+    //     orders: [...prevState.orders, newOrder]
+    //   })
+    // );
   }
 
-  private handleOrderbookEvent(orderbookEvent) {
-    switch (orderbookEvent.type) {
-      case 'snapshot':
-        console.log('got a snapshot orderbook event', orderbookEvent);
-      case 'update':
-        // right now updates are only new orders
-      const newOrder = orderbookEvent.payload;
-      this.setState((prevState) => ({
-          orders: [...prevState.orders, newOrder]
-        })
-      );
+  handleOrderbookSnapshot(snapshot) {}
 
-        console.log('got a update orderbook event', orderbookEvent);
-      case 'fill':
-        // remember this is nonstandard api spec
-        console.log('got a fill orderbook event', orderbookEvent);
-      default:
-        console.log('unrecognized orderbook event', orderbookEvent);
-    }
-  }
+  handleOrderbookFill(fill) {}
 
   render() {
     const { lastWebSocketUpdate, connectionStatus } = this.state;
     return (
       <AppContainer>
-        <WS
-          ref={ref => {
-            this.ws = ref;
-          }}
+        <ZeroExFeed
+          ref={ref => (this.feed = ref)}
           url={WS_ENDPOINT}
           onOpen={this.handleSocketOpen}
           onMessage={this.handleSocketMessage}
           onClose={this.handleSocketClose}
           onError={this.handleSocketError}
+          onOrderbookSnapshot={this.handleOrderbookSnapshot}
+          onOrderbookUpdate={this.handleOrderbookUpdate}
+          onOrderbookFill={this.handleOrderbookFill}
         />
         <AppHeader title={'Conduit'} subtitle={'Open Source 0x Relayer'} logo={logo} />
         {connectionStatus === 'disconnected' ? (
@@ -227,33 +220,9 @@ class App extends Component<AppProps, AppState> {
       </AppContainer>
     );
   }
-
-  private subscribeToRelayerWebSocketFeed(
-    baseTokenAddress: string,
-    quoteTokenAddress: string,
-    snapshot = true,
-    limit = 100
-  ) {
-    if (!this.ws) {
-      return;
-    }
-    this.ws.send(
-      JSON.stringify({
-        channel: 'orderbook',
-        type: 'subscribe',
-        payload: {
-          baseTokenAddress,
-          quoteTokenAddress,
-          snapshot,
-          limit,
-        },
-      })
-    );
-  }
 }
 
 export default App;
-
 
 // @keyframes highlight {
 //   0% {
@@ -267,7 +236,6 @@ export default App;
 // #highlight:target {
 //   animation: highlight 1s;
 // }
-
 
 // interface Order {
 //   type: string;
