@@ -9,9 +9,13 @@ export interface OrderbookUpdate {
   asks: Array<SignedOrder>;
 }
 
-export interface OrderbookFill {}
+export interface OrderbookFill {
+  test: string;
+}
 
-export interface RelayerSocketResponse<T extends OrderbookSnapshot | OrderbookUpdate> {
+export interface RelayerSocketResponse<
+  T extends OrderbookSnapshot | OrderbookUpdate | OrderbookFill
+> {
   type: string;
   channel: string;
   channelId: number;
@@ -20,10 +24,10 @@ export interface RelayerSocketResponse<T extends OrderbookSnapshot | OrderbookUp
 
 export interface ZeroExFeedProps {
   url: string;
-  onOpen?(e: Event): any;
-  onMessage?(me: MessageEvent): any;
-  onClose?(ce: CloseEvent): any;
-  onError?(e: Event): any;
+  onOpen?(e: Event): void;
+  onMessage?(me: MessageEvent): void;
+  onClose?(ce: CloseEvent): void;
+  onError?(e: Event): void;
   onOrderbookSnapshot(snapshot: RelayerSocketResponse<OrderbookSnapshot>): void;
   onOrderbookUpdate(update: RelayerSocketResponse<OrderbookUpdate>): void;
   onOrderbookFill(fill: RelayerSocketResponse<any>): void;
@@ -98,15 +102,19 @@ export class ZeroExFeed extends Component<ZeroExFeedProps, ZeroExFeedState> {
     switch (orderbookEvent.type) {
       case 'snapshot':
         const orderbookSnapshotEvent = orderbookEvent as RelayerSocketResponse<OrderbookSnapshot>;
-        const orderbookSnapshot = orderbookSnapshotEvent.payload;
         console.log('got a snapshot orderbook event', orderbookSnapshotEvent);
+        const orderbookSnapshot = orderbookSnapshotEvent.payload;
+        this.props.onOrderbookSnapshot && this.props.onOrderbookSnapshot(orderbookSnapshotEvent);
       case 'update':
         const orderbookUpdateEvent = orderbookEvent as RelayerSocketResponse<OrderbookUpdate>;
-        const updatedOrder = orderbookUpdateEvent.payload;
         console.log('got a update orderbook event', orderbookEvent, orderbookUpdateEvent);
+        const updatedOrder = orderbookUpdateEvent.payload;
+        this.props.onOrderbookUpdate && this.props.onOrderbookUpdate(orderbookUpdateEvent);
       case 'fill':
         // remember this is nonstandard api spec
         console.log('got a fill orderbook event', orderbookEvent);
+        const orderbookFillEvent = orderbookEvent as RelayerSocketResponse<OrderbookFill>;
+        this.props.onOrderbookFill && this.props.onOrderbookFill(orderbookEvent);
       default:
         console.log('unrecognized orderbook event', orderbookEvent);
     }

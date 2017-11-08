@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { BigNumber } from 'bignumber.js';
 import { ZeroEx } from '0x.js';
 import { RBTree } from 'bintrees';
+import { subHours, subMinutes, subDays } from 'date-fns';
 import { AppContainer, AppContent, MainPanel, ContentHeader } from './components/MainLayout';
 import { TradeTable, TableFlexGrow } from './components/TradeTable';
 import { AppHeader } from './components/Header';
@@ -27,8 +28,6 @@ const exchange = require('./assets/icons/exchange-black.svg');
 BigNumber.config({
   EXPONENTIAL_AT: 1000,
 });
-
-import { subHours, subMinutes, subDays, distanceInWordsToNow } from 'date-fns';
 
 const dateFiveHoursAgo = subHours(new Date(), 5);
 const dateTenMinutesAgo = subMinutes(new Date(), 10);
@@ -134,20 +133,13 @@ class App extends Component<AppProps, AppState> {
 
   handleSocketOpen = () => {
     this.setState({ lastWebSocketUpdate: new Date(), connectionStatus: 'connected' });
+    console.log('ws open');
     // this.subscribeToRelayerWebSocketFeed(tokenPairToWatch.baseToken, tokenPairToWatch.quoteToken);
   };
 
   handleSocketMessage = (msg: MessageEvent) => {
     this.setState({ lastWebSocketUpdate: new Date() });
     console.log('Received message from Conduit WebSocket server', msg.data);
-    const event = JSON.parse(msg.data);
-    switch (event.channel) {
-      case 'orderbook':
-        console.log('got an orderbook event');
-        this.handleOrderbookEvent(event);
-      default:
-        console.log('default', event);
-    }
   };
 
   handleSocketClose = () => {
@@ -160,6 +152,7 @@ class App extends Component<AppProps, AppState> {
   };
 
   handleOrderbookUpdate(orderbookUpdate) {
+    console.log(orderbookUpdate);
     // const newOrder = orderbookEvent.payload;
     // this.setState((prevState) => ({
     //     orders: [...prevState.orders, newOrder]
@@ -167,9 +160,13 @@ class App extends Component<AppProps, AppState> {
     // );
   }
 
-  handleOrderbookSnapshot(snapshot) {}
+  handleOrderbookSnapshot(snapshot) {
+    console.log(snapshot);
+  }
 
-  handleOrderbookFill(fill) {}
+  handleOrderbookFill(fill) {
+    console.log(fill);
+  }
 
   render() {
     const { lastWebSocketUpdate, connectionStatus } = this.state;
