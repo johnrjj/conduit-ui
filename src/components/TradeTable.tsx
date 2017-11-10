@@ -22,7 +22,7 @@ export class TradeTable extends React.Component<any, any> {
 
   render() {
     const { data } = this.props;
-    console.log(data);
+    // console.log(data);
     const rowGetter = ({ index }: { index: number }) => this._getDatum(data, index);
     const rowCount = (data && data.length) || 0;
     return (
@@ -67,7 +67,8 @@ export class TradeTable extends React.Component<any, any> {
             <Column
               label="DATE ADDED"
               cellDataGetter={({ rowData }) =>
-                distanceInWordsToNow(rowData.date, { includeSeconds: true, addSuffix: true })}
+                distanceInWordsToNow(rowData.date, { includeSeconds: true, addSuffix: true })
+              }
               cellRenderer={({ cellData }) => cellData}
               dataKey="val"
               width={120}

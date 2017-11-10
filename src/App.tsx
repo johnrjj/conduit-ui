@@ -2,13 +2,13 @@ import * as React from 'react';
 import { Component } from 'react';
 import styled from 'styled-components';
 import { BigNumber } from 'bignumber.js';
-import { ZeroEx } from '0x.js';
+import { ZeroEx, SignedOrder } from '0x.js';
 import { RBTree } from 'bintrees';
 import { subHours, subMinutes, subDays } from 'date-fns';
 import { AppContainer, AppContent, MainPanel, ContentHeader } from './components/MainLayout';
 import { TradeTable, TableFlexGrow } from './components/TradeTable';
 import { AppHeader } from './components/Header';
-import { ZeroExFeed } from './components/ZeroExFeed';
+import { ZeroExFeed, OrderbookSnapshot } from './components/ZeroExFeed';
 import {
   SidePanel,
   SidePanelHeader,
@@ -33,140 +33,197 @@ const dateFiveHoursAgo = subHours(new Date(), 5);
 const dateTenMinutesAgo = subMinutes(new Date(), 10);
 const dateTwoDaysAgo = subDays(new Date(), 2);
 
-ZeroEx.toBaseUnitAmount(new BigNumber(1212), 18);
-ZeroEx.toUnitAmount(new BigNumber('12121212'), 18);
+// ZeroEx.toBaseUnitAmount(new BigNumber(1212), 18);
+// ZeroEx.toUnitAmount(new BigNumber('12121212'), 18);
 
-const data = [
-  {
-    index: 0,
-    maker: ZeroEx.toUnitAmount(new BigNumber(10000000000000000000000), 18).toString(),
-    taker: ZeroEx.toBaseUnitAmount(new BigNumber(1000), 18).toString(),
-    exchange: '1 ZRX / 1.3 MKR',
-    date: dateTenMinutesAgo,
-  },
-  {
-    index: 1,
-    maker: '1 WETH',
-    taker: '10.00000 DGB',
-    exchange: '1 WETH / 10 DGB',
-    date: dateFiveHoursAgo,
-  },
-  {
-    index: 2,
-    maker: '7.14 ZRX',
-    taker: '10.100 MKR',
-    exchange: '1 ZRX / 1.3 MKR',
-    date: dateTwoDaysAgo,
-  },
-];
+// const data = [
+//   {
+//     index: 0,
+//     maker: ZeroEx.toUnitAmount(new BigNumber(10000000000000000000000), 18).toString(),
+//     taker: ZeroEx.toBaseUnitAmount(new BigNumber(1000), 18).toString(),
+//     exchange: '1 ZRX / 1.3 MKR',
+//     date: dateTenMinutesAgo,
+//   },
+//   {
+//     index: 1,
+//     maker: '1 WETH',
+//     taker: '10.00000 DGB',
+//     exchange: '1 WETH / 10 DGB',
+//     date: dateFiveHoursAgo,
+//   },
+//   {
+//     index: 2,
+//     maker: '7.14 ZRX',
+//     taker: '10.100 MKR',
+//     exchange: '1 ZRX / 1.3 MKR',
+//     date: dateTwoDaysAgo,
+//   },
+// ];
 
 // https://dribbble.com/shots/3907247-CL-Overview-UI
 // https://dribbble.com/shots/3914200-Web-operation-steps
 
-const API_ENDPOINT_ROOT =
-  process.env.NODE_ENV === '!development'
-    ? 'http://localhost:3001/api/v0'
-    : 'https://conduit-relay.herokuapp.com/api/v0';
-
-const WS_ENDPOINT =
-  process.env.NODE_ENV === '!development'
-    ? 'ws://localhost:3001/ws'
-    : 'wss://conduit-relay.herokuapp.com/ws';
-
-const tokenPairToWatch = {
+const defaultTokenPairToWatch = {
   baseToken: '0x05d090b51c40b020eab3bfcb6a2dff130df22e9c',
   quoteToken: '0x1dad4783cf3fe3085c1426157ab175a6119a04ba',
 };
 
-const getTokens = async () => {
-  const res = await fetch(`${API_ENDPOINT_ROOT}/tokens`);
-  const json = res.json();
-  return json;
-};
-
-const getTokenPairs = async () => {
-  const res = await fetch(`${API_ENDPOINT_ROOT}/token_pairs`);
-  const json = res.json();
-  return json;
-};
-
-export interface AppProps {}
+export interface AppProps {
+  restEndpoint: string;
+  wsEndpoint: string;
+}
 export interface AppState {
   connectionStatus: 'connected' | 'disconnected' | 'loading';
   lastWebSocketUpdate?: Date;
-  bids: RBTree<any>;
-  asks: RBTree<any>;
+  bids: RBTree<SignedOrder>;
+  asks: RBTree<SignedOrder>;
+  orderDetails: WeakMap<SignedOrder, OrderDetails>;
   recentFills: Array<any>;
   tokens: Array<any>;
   tokenPairs: Array<any>;
+  currentBaseTokenAddress: string;
+  currentQuoteTokenAddress: string;
 }
 
-ZeroEx.toBaseUnitAmount(new BigNumber(1212), 18);
-ZeroEx.toUnitAmount(new BigNumber('12121212'), 18);
+export interface Token {}
 
-class App extends Component<AppProps, AppState> {
+export interface OrderDetails {
+  price: BigNumber;
+}
+
+// note, app props is bugging out with ts right now (known ts-react issue), setting to any
+class App extends Component<AppProps | any, AppState> {
   feed: ZeroExFeed | null;
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       connectionStatus: 'loading',
-      bids: new RBTree((a, b) => 1),
-      asks: new RBTree((a, b) => -1),
+      bids: new RBTree<SignedOrder>((a, b) => 1),
+      asks: new RBTree<SignedOrder>((a, b) => -1),
+      orderDetails: new WeakMap<SignedOrder, OrderDetails>(),
       recentFills: [],
       tokens: [],
       tokenPairs: [],
+      currentBaseTokenAddress: defaultTokenPairToWatch.baseToken,
+      currentQuoteTokenAddress: defaultTokenPairToWatch.quoteToken,
     };
   }
 
   async componentDidMount() {
-    await this.loadTokensAndTokenPairs();
-  }
-
-  async loadTokensAndTokenPairs() {
-    const tokens = await getTokenPairs();
-    const tokenPairs = await getTokens();
+    const tokens = await this.getTokens();
+    const tokenPairs = await this.getTokenPairs();
     this.setState({
       tokens,
       tokenPairs,
     });
+    this.setState({ lastWebSocketUpdate: new Date(), connectionStatus: 'connected' });
+    this.feed &&
+      this.feed.subscribeToOrderbook(
+        defaultTokenPairToWatch.baseToken,
+        defaultTokenPairToWatch.quoteToken
+      );
+    console.log(this.state);
   }
 
-  handleSocketOpen = () => {
-    this.setState({ lastWebSocketUpdate: new Date(), connectionStatus: 'connected' });
-    console.log('ws open');
-    // this.subscribeToRelayerWebSocketFeed(tokenPairToWatch.baseToken, tokenPairToWatch.quoteToken);
-  };
+  handleSocketMessage = (_: MessageEvent) => this.setState({ lastWebSocketUpdate: new Date() });
 
-  handleSocketMessage = (msg: MessageEvent) => {
-    this.setState({ lastWebSocketUpdate: new Date() });
-    console.log('Received message from Conduit WebSocket server', msg.data);
-  };
-
-  handleSocketClose = () => {
+  handleSocketClose = () =>
     this.setState({ lastWebSocketUpdate: undefined, connectionStatus: 'disconnected' });
-    console.log('close');
-  };
-
-  handleSocketError = (err: any) => {
-    console.error('Error with relay websocket', err);
-  };
 
   handleOrderbookUpdate(orderbookUpdate) {
     console.log(orderbookUpdate);
-    // const newOrder = orderbookEvent.payload;
-    // this.setState((prevState) => ({
-    //     orders: [...prevState.orders, newOrder]
-    //   })
-    // );
   }
 
-  handleOrderbookSnapshot(snapshot) {
-    console.log(snapshot);
-  }
+  handleOrderbookSnapshot = (snapshot: OrderbookSnapshot) => {
+    const { bids, asks } = snapshot;
+    console.log('bids', bids);
+    console.log('asks', asks);
+
+    const { currentBaseTokenAddress, currentQuoteTokenAddress } = this.state;
+
+    const getTokenSymbol = (address: string) => {
+      const token = this.state.tokens.find(x => x.address === address);
+      const symbol = token.symbol;
+      return symbol;
+    };
+
+    const baseSymbol = getTokenSymbol(currentBaseTokenAddress);
+    const quoteSymbol = getTokenSymbol(currentQuoteTokenAddress);
+
+    bids.map(bid => {
+      const orderDetail = this.computeOrderDetails(
+        bid,
+        currentBaseTokenAddress,
+        currentQuoteTokenAddress
+      );
+      console.log(
+        `BUY: ${orderDetail.quoteUnitAmount} ${quoteSymbol} for ${orderDetail.baseUnitAmount} ${
+          baseSymbol
+        } @ ${orderDetail.price}`
+      );
+    });
+    asks.map(ask => {
+      const orderDetail = this.computeOrderDetails(
+        ask,
+        currentBaseTokenAddress,
+        currentQuoteTokenAddress
+      );
+      console.log(
+        `SELL: ${orderDetail.quoteUnitAmount} ${quoteSymbol} for ${orderDetail.baseUnitAmount} ${
+          baseSymbol
+        } ${orderDetail.price}`
+      );
+    });
+  };
+
+  computeOrderDetails = (order: SignedOrder, baseToken: string, quoteToken: string) => {
+    const makerToken = this.state.tokens.find(t => t.address === order.makerTokenAddress);
+    const takerToken = this.state.tokens.find(t => t.address === order.takerTokenAddress);
+    const makerUnitAmount = ZeroEx.toUnitAmount(
+      new BigNumber(order.makerTokenAmount),
+      makerToken.decimals
+    );
+    const takerUnitAmount = ZeroEx.toUnitAmount(
+      new BigNumber(order.takerTokenAmount),
+      takerToken.decimals
+    );
+
+    const baseUnitAmount = baseToken === makerToken.address ? makerUnitAmount : takerUnitAmount;
+
+    const quoteUnitAmount = baseToken === makerToken.address ? takerUnitAmount : makerUnitAmount;
+
+    const price: BigNumber =
+      baseToken === makerToken.address
+        ? makerUnitAmount.div(takerUnitAmount)
+        : takerUnitAmount.div(makerUnitAmount);
+
+    return {
+      price,
+      baseUnitAmount,
+      quoteUnitAmount,
+    };
+  };
 
   handleOrderbookFill(fill) {
     console.log(fill);
   }
+
+  private getTokens = async () => {
+    const res = await fetch(`${this.props.restEndpoint}/tokens`);
+    const json = res.json();
+    return json;
+  };
+
+  private getTokenPairs = async () => {
+    const res = await fetch(`${this.props.restEndpoint}/token_pairs`);
+    const json = res.json();
+    return json;
+  };
+
+  private getTradingSymbol = () => {
+    {
+    }
+  };
 
   render() {
     const { lastWebSocketUpdate, connectionStatus } = this.state;
@@ -174,11 +231,9 @@ class App extends Component<AppProps, AppState> {
       <AppContainer>
         <ZeroExFeed
           ref={ref => (this.feed = ref)}
-          url={WS_ENDPOINT}
-          onOpen={this.handleSocketOpen}
+          url={this.props.wsEndpoint}
           onMessage={this.handleSocketMessage}
           onClose={this.handleSocketClose}
-          onError={this.handleSocketError}
           onOrderbookSnapshot={this.handleOrderbookSnapshot}
           onOrderbookUpdate={this.handleOrderbookUpdate}
           onOrderbookFill={this.handleOrderbookFill}
@@ -192,9 +247,7 @@ class App extends Component<AppProps, AppState> {
           <AppContent>
             <MainPanel>
               <ContentHeader>Open Orders</ContentHeader>
-              <TableFlexGrow>
-                <TradeTable data={data} />
-              </TableFlexGrow>
+              <TableFlexGrow>{/* <TradeTable data={data} /> */}</TableFlexGrow>
             </MainPanel>
             <SidePanel>
               <SidePanelHeader>Recent fills</SidePanelHeader>

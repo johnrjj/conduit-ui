@@ -2,9 +2,9 @@ import * as React from 'react';
 import { Component } from 'react';
 import { ZeroEx, SignedOrder } from '0x.js';
 
-export type OrderbookSnapshot = SignedOrder;
+export type OrderbookUpdate = SignedOrder;
 
-export interface OrderbookUpdate {
+export interface OrderbookSnapshot {
   bids: Array<SignedOrder>;
   asks: Array<SignedOrder>;
 }
@@ -28,7 +28,7 @@ export interface ZeroExFeedProps {
   onMessage?(me: MessageEvent): void;
   onClose?(ce: CloseEvent): void;
   onError?(e: Event): void;
-  onOrderbookSnapshot(snapshot: RelayerSocketResponse<OrderbookSnapshot>): void;
+  onOrderbookSnapshot(snapshot: OrderbookSnapshot): void;
   onOrderbookUpdate(update: RelayerSocketResponse<OrderbookUpdate>): void;
   onOrderbookFill(fill: RelayerSocketResponse<any>): void;
 }
@@ -70,7 +70,7 @@ export class ZeroExFeed extends Component<ZeroExFeedProps, ZeroExFeedState> {
     );
   }
 
-  send = (data: any) => this.state.ws.send(data);
+  send = (data: any) => this.waitForConnection(() => this.state.ws.send(data));
 
   reconnect = () => this.handleWebSocketSetup();
 
@@ -79,18 +79,19 @@ export class ZeroExFeed extends Component<ZeroExFeedProps, ZeroExFeedState> {
       console.log('Recevied empty message from Conduit WebSocket server, returning');
       return;
     }
-    console.log('Received message from Conduit WebSocket server', msg.data);
     try {
       const event: RelayerSocketResponse<any> = JSON.parse(msg.data);
       switch (event.channel) {
         case 'orderbook':
           console.log('got an orderbook channel event');
           this.handleOrderbookEvent(event);
+          return;
         default:
           console.log(
             'Unrecognized event channel, only supports orderbook channel right now',
             event
           );
+          return;
       }
     } catch (e) {
       console.error('Error parsing event from connected WebSocket', e, msg.data);
@@ -104,20 +105,32 @@ export class ZeroExFeed extends Component<ZeroExFeedProps, ZeroExFeedState> {
         const orderbookSnapshotEvent = orderbookEvent as RelayerSocketResponse<OrderbookSnapshot>;
         console.log('got a snapshot orderbook event', orderbookSnapshotEvent);
         const orderbookSnapshot = orderbookSnapshotEvent.payload;
-        this.props.onOrderbookSnapshot && this.props.onOrderbookSnapshot(orderbookSnapshotEvent);
+        this.props.onOrderbookSnapshot &&
+          this.props.onOrderbookSnapshot(orderbookSnapshotEvent.payload);
+        return;
       case 'update':
+        console.log('2');
         const orderbookUpdateEvent = orderbookEvent as RelayerSocketResponse<OrderbookUpdate>;
         console.log('got a update orderbook event', orderbookEvent, orderbookUpdateEvent);
         const updatedOrder = orderbookUpdateEvent.payload;
         this.props.onOrderbookUpdate && this.props.onOrderbookUpdate(orderbookUpdateEvent);
+        return;
       case 'fill':
         // remember this is nonstandard api spec
         console.log('got a fill orderbook event', orderbookEvent);
         const orderbookFillEvent = orderbookEvent as RelayerSocketResponse<OrderbookFill>;
         this.props.onOrderbookFill && this.props.onOrderbookFill(orderbookEvent);
+        return;
       default:
         console.log('unrecognized orderbook event', orderbookEvent);
+        return;
     }
+  }
+
+  private waitForConnection(callback, interval = 1000) {
+    this.state.ws.readyState === this.state.ws.OPEN
+      ? callback()
+      : setTimeout(() => this.waitForConnection(callback, interval), interval); //todo expon retry
   }
 
   private handleWebSocketSetup() {
