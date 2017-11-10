@@ -77,7 +77,7 @@ export interface AppState {
   lastWebSocketUpdate?: Date;
   bids: RBTree<SignedOrder>;
   asks: RBTree<SignedOrder>;
-  orderDetails: WeakMap<SignedOrder, OrderDetails>;
+  orderDetailsMap: WeakMap<SignedOrder, OrderDetails>;
   recentFills: Array<any>;
   tokens: Array<any>;
   tokenPairs: Array<any>;
@@ -98,9 +98,9 @@ class App extends Component<AppProps | any, AppState> {
     super(props);
     this.state = {
       connectionStatus: 'loading',
-      bids: new RBTree<SignedOrder>((a, b) => 1),
-      asks: new RBTree<SignedOrder>((a, b) => -1),
-      orderDetails: new WeakMap<SignedOrder, OrderDetails>(),
+      bids: new RBTree<SignedOrder>(this.sortOrdersAsc),
+      asks: new RBTree<SignedOrder>(this.sortOrdersDesc),
+      orderDetailsMap: new WeakMap<SignedOrder, OrderDetails>(),
       recentFills: [],
       tokens: [],
       tokenPairs: [],
@@ -134,23 +134,17 @@ class App extends Component<AppProps | any, AppState> {
     console.log(orderbookUpdate);
   }
 
+  handleOrderbookFill(fill) {
+    console.log(fill);
+  }
+
   handleOrderbookSnapshot = (snapshot: OrderbookSnapshot) => {
     const { bids, asks } = snapshot;
-    console.log('bids', bids);
-    console.log('asks', asks);
-
     const { currentBaseTokenAddress, currentQuoteTokenAddress } = this.state;
+    const baseSymbol = this.getTokenSymbol(currentBaseTokenAddress);
+    const quoteSymbol = this.getTokenSymbol(currentQuoteTokenAddress);
 
-    const getTokenSymbol = (address: string) => {
-      const token = this.state.tokens.find(x => x.address === address);
-      const symbol = token.symbol;
-      return symbol;
-    };
-
-    const baseSymbol = getTokenSymbol(currentBaseTokenAddress);
-    const quoteSymbol = getTokenSymbol(currentQuoteTokenAddress);
-
-    bids.map(bid => {
+    bids.forEach(bid => {
       const orderDetail = this.computeOrderDetails(
         bid,
         currentBaseTokenAddress,
@@ -161,8 +155,10 @@ class App extends Component<AppProps | any, AppState> {
           baseSymbol
         } @ ${orderDetail.price}`
       );
+      this.addOrderDetails(bid, orderDetail);
+      this.addBid(bid);
     });
-    asks.map(ask => {
+    asks.forEach(ask => {
       const orderDetail = this.computeOrderDetails(
         ask,
         currentBaseTokenAddress,
@@ -171,12 +167,59 @@ class App extends Component<AppProps | any, AppState> {
       console.log(
         `SELL: ${orderDetail.quoteUnitAmount} ${quoteSymbol} for ${orderDetail.baseUnitAmount} ${
           baseSymbol
-        } ${orderDetail.price}`
+        } @ ${orderDetail.price}`
       );
+      this.addOrderDetails(ask, orderDetail);
+      this.addAsk(ask);
     });
   };
 
-  computeOrderDetails = (order: SignedOrder, baseToken: string, quoteToken: string) => {
+  private addOrderDetails(signedOrder: SignedOrder, orderDetails: OrderDetails) {
+    this.setState((prevState: AppState) => {
+      const { orderDetailsMap } = prevState;
+      orderDetailsMap.set(signedOrder, orderDetails);
+      return {
+        orderDetailsMap,
+      };
+    });
+  }
+
+  private addAsk(ask: SignedOrder) {
+    this.setState((prevState: AppState) => {
+      const { asks } = prevState;
+      asks.insert(ask);
+      return {
+        asks,
+      };
+    });
+  }
+
+  private addBid(bid: SignedOrder) {
+    this.setState((prevState: AppState) => {
+      const { bids } = prevState;
+      bids.insert(bid);
+      return {
+        bid,
+      };
+    });
+  }
+
+  private getPriceForSignedOrder(signedOrder) {
+    const data = this.state.orderDetailsMap.get(signedOrder);
+    return data && data.price;
+  }
+
+  getTokenSymbol(address: string) {
+    const token = this.state.tokens.find(x => x.address === address);
+    const symbol = token.symbol;
+    return symbol;
+  }
+
+  private computeOrderDetails = (
+    order: SignedOrder,
+    baseTokenAddress: string,
+    quoteTokenAddress: string
+  ) => {
     const makerToken = this.state.tokens.find(t => t.address === order.makerTokenAddress);
     const takerToken = this.state.tokens.find(t => t.address === order.takerTokenAddress);
     const makerUnitAmount = ZeroEx.toUnitAmount(
@@ -187,13 +230,13 @@ class App extends Component<AppProps | any, AppState> {
       new BigNumber(order.takerTokenAmount),
       takerToken.decimals
     );
-
-    const baseUnitAmount = baseToken === makerToken.address ? makerUnitAmount : takerUnitAmount;
-
-    const quoteUnitAmount = baseToken === makerToken.address ? takerUnitAmount : makerUnitAmount;
+    const baseUnitAmount =
+      baseTokenAddress === makerToken.address ? makerUnitAmount : takerUnitAmount;
+    const quoteUnitAmount =
+      baseTokenAddress === makerToken.address ? takerUnitAmount : makerUnitAmount;
 
     const price: BigNumber =
-      baseToken === makerToken.address
+      baseTokenAddress === makerToken.address
         ? makerUnitAmount.div(takerUnitAmount)
         : takerUnitAmount.div(makerUnitAmount);
 
@@ -204,9 +247,23 @@ class App extends Component<AppProps | any, AppState> {
     };
   };
 
-  handleOrderbookFill(fill) {
-    console.log(fill);
-  }
+  private sortOrdersDesc = (a: SignedOrder, b: SignedOrder) => {
+    const priceA = this.getPriceForSignedOrder(a);
+    const priceB = this.getPriceForSignedOrder(b);
+    if (priceA && priceB) {
+      return priceA.sub(priceB).toNumber();
+    }
+    return -1;
+  };
+
+  private sortOrdersAsc = (a: SignedOrder, b: SignedOrder) => {
+    const priceA = this.getPriceForSignedOrder(a);
+    const priceB = this.getPriceForSignedOrder(b);
+    if (priceA && priceB) {
+      return priceB.sub(priceB).toNumber();
+    }
+    return -1;
+  };
 
   private getTokens = async () => {
     const res = await fetch(`${this.props.restEndpoint}/tokens`);
@@ -220,13 +277,12 @@ class App extends Component<AppProps | any, AppState> {
     return json;
   };
 
-  private getTradingSymbol = () => {
-    {
-    }
-  };
-
   render() {
-    const { lastWebSocketUpdate, connectionStatus } = this.state;
+    const { lastWebSocketUpdate, connectionStatus, asks, bids } = this.state;
+
+    const lowestBid = bids.min();
+    const highestAsk = asks.max();
+    console.log(lowestBid, highestAsk);
     return (
       <AppContainer>
         <ZeroExFeed
