@@ -7,8 +7,6 @@
     "bignumber.js": "^4.1.0",
     "bintrees": "^1.0.2",
     "date-fns": "^1.29.0",
-    "mock-socket": "^7.0.0",
-    "prettier": "^1.7.4",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-scripts-ts": "2.7.0",
@@ -31,6 +29,8 @@
     "@types/react": "^16.0.10",
     "@types/react-dom": "^16.0.1",
     "@types/react-virtualized": "^9.7.5",
+    "mock-socket": "^7.0.0",
+    "prettier": "^1.7.4",
     "web3-typescript-typings": "^0.7.1"
   }
 }
