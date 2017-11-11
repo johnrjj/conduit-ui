@@ -6,5 +6,18 @@ import './index.css';
 import 'react-virtualized/styles.css';
 import 'react-vis/dist/style.css';
 
-ReactDOM.render(<App />, document.getElementById('root') as HTMLElement);
+const API_ENDPOINT_ROOT =
+  process.env.NODE_ENV === '!development'
+    ? 'http://localhost:3001/api/v0'
+    : 'https://conduit-relay.herokuapp.com/api/v0';
+
+const WS_ENDPOINT =
+  process.env.NODE_ENV === '!development'
+    ? 'ws://localhost:3001/ws'
+    : 'wss://conduit-relay.herokuapp.com/ws';
+
+ReactDOM.render(
+  <App restEndpoint={API_ENDPOINT_ROOT} wsEndpoint={WS_ENDPOINT} />,
+  document.getElementById('root') as HTMLElement
+);
 registerServiceWorker();

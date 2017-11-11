@@ -7,7 +7,7 @@ export interface TimeSinceProps {
 }
 
 export class TimeSince extends React.Component<TimeSinceProps, any> {
-  interval?: number;
+  private interval?: number;
 
   componentDidMount() {
     if (this.props.date) {
@@ -16,23 +16,13 @@ export class TimeSince extends React.Component<TimeSinceProps, any> {
   }
 
   componentWillUnmount() {
-    if (this.interval) {
-      clearInterval(this.interval);
-    }
+    this.clearIntervalIfSet();
   }
 
   componentDidUpdate(prevProps: TimeSinceProps) {
     if (this.props.date !== prevProps.date) {
       this.trackTimeSince();
     }
-  }
-
-  trackTimeSince() {
-    if (this.interval) {
-      clearInterval(this.interval);
-      this.interval = undefined;
-    }
-    this.interval = window.setInterval(() => this.forceUpdate(), 1000);
   }
 
   render() {
@@ -42,5 +32,17 @@ export class TimeSince extends React.Component<TimeSinceProps, any> {
       : undefined;
 
     return <p>{this.props.formatter(text)}</p>;
+  }
+
+  private trackTimeSince() {
+    this.clearIntervalIfSet();
+    this.interval = window.setInterval(() => this.forceUpdate(), 1000);
+  }
+
+  private clearIntervalIfSet() {
+    if (this.interval) {
+      clearInterval(this.interval);
+      this.interval = undefined;
+    }
   }
 }

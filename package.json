@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "0x.js": "^0.22.0",
+    "0x.js": "^0.22.4",
+    "bignumber.js": "^4.1.0",
+    "bintrees": "^1.0.2",
     "date-fns": "^1.29.0",
-    "mock-socket": "^7.0.0",
-    "prettier": "^1.7.4",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-scripts-ts": "2.7.0",
@@ -23,11 +23,14 @@
     "prettier": "prettier --single-quote --print-width 100 --trailing-comma es5 --write 'src/**/*.tsx'"
   },
   "devDependencies": {
-    "@types/date-fns": "^2.6.0",
+    "@types/bintrees": "^1.0.2",
     "@types/jest": "^21.1.2",
     "@types/node": "^8.0.34",
     "@types/react": "^16.0.10",
     "@types/react-dom": "^16.0.1",
-    "@types/react-virtualized": "^9.7.5"
+    "@types/react-virtualized": "^9.7.5",
+    "mock-socket": "^7.0.0",
+    "prettier": "^1.7.4",
+    "web3-typescript-typings": "^0.7.1"
   }
 }

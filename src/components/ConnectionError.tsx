@@ -2,19 +2,13 @@ import * as React from 'react';
 import styled from 'styled-components';
 import colors from '../util/colors';
 
-const CenterHorizAndVert = styled.div`
+const CenterHorizontallyAndVertically = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-bottom: 4rem;
-`;
-
-const DisconnectedIcon = styled.i`
-  font-size: 4.5rem;
-  margin: 1rem;
-  color: ${colors.darkGrey};
 `;
 
 const DisconnectedTitle = styled.h1`
@@ -35,15 +29,21 @@ const DisconnectedDescription = styled.p`
   color: ${colors.darkGrey};
 `;
 
+const DisconnectedIcon = styled.i`
+  font-size: 4.5rem;
+  margin: 1rem;
+  color: ${colors.darkGrey};
+`;
+
 const ConnectionError = () => (
-  <CenterHorizAndVert>
+  <CenterHorizontallyAndVertically>
     <DisconnectedIcon className="material-icons">error_outline</DisconnectedIcon>
     <DisconnectedTitle>Conduit not connected</DisconnectedTitle>
     <DisconnectedDescription>No live connection to a Conduit detected</DisconnectedDescription>
     <DisconnectedDescription>
-      Make sure your Conduit server is running and the UI is pointed at the right endpoint
+      Make sure your Conduit server is running at the correct URL
     </DisconnectedDescription>
-  </CenterHorizAndVert>
+  </CenterHorizontallyAndVertically>
 );
 
 export { ConnectionError };
