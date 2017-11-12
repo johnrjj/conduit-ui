@@ -33,29 +33,40 @@ export interface ZeroExFeedProps {
   onOrderbookFill(fill: RelayerSocketResponse<any>): void;
 }
 
-export interface ZeroExFeedState {
-  ws: WebSocket;
-}
+// export interface ZeroExFeedState {
+//   ws?: WebSocket;
+// }
 
-export class ZeroExFeed extends Component<ZeroExFeedProps, ZeroExFeedState> {
+export class ZeroExFeed extends Component<ZeroExFeedProps> {
+  ws: WebSocket;
+  constructor(props) {
+    super(props);
+    // this.state = {
+    //   ws: undefined,
+    // }
+  }
   componentDidMount() {
     this.handleWebSocketSetup();
   }
 
+  compoenntWillReceiveProps() {
+    this.handleWebSocketSetup();
+  }
+
   componentWillUnmount() {
-    this.state.ws.close();
+    this.ws && this.ws.close();
   }
 
   render() {
     return null;
   }
 
-  subscribeToOrderbook(
+  subscribeToOrderbook = (
     baseTokenAddress: string,
     quoteTokenAddress: string,
     snapshot = true,
     limit = 100
-  ) {
+  ) => {
     this.send(
       JSON.stringify({
         channel: 'orderbook',
@@ -68,9 +79,11 @@ export class ZeroExFeed extends Component<ZeroExFeedProps, ZeroExFeedState> {
         },
       })
     );
-  }
+  };
 
-  send = (data: any) => this.waitForConnection(() => this.state.ws.send(data));
+  send(data: any) {
+    this.waitForConnection(() => this.ws.send(data));
+  }
 
   reconnect = () => this.handleWebSocketSetup();
 
@@ -127,19 +140,19 @@ export class ZeroExFeed extends Component<ZeroExFeedProps, ZeroExFeedState> {
     }
   }
 
-  private waitForConnection(callback, interval = 1000) {
-    this.state.ws.readyState === this.state.ws.OPEN
+  waitForConnection = (callback, interval = 1000) => {
+    this.ws.readyState === this.ws.OPEN
       ? callback()
       : setTimeout(() => this.waitForConnection(callback, interval), interval); //todo expon retry
-  }
+  };
 
-  private handleWebSocketSetup() {
+  handleWebSocketSetup = () => {
     const ws = new WebSocket(this.props.url);
     ws.onopen = event => this.props.onOpen && this.props.onOpen(event);
     ws.onmessage = event =>
       this.handleSocketMessage(event) || (this.props.onMessage && this.props.onMessage(event));
     ws.onerror = error => this.props.onError && this.props.onError(error);
     ws.onclose = close => this.props.onClose && this.props.onClose(close);
-    this.setState({ ws });
-  }
+    this.ws = ws;
+  };
 }

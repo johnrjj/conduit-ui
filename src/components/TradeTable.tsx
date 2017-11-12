@@ -17,6 +17,7 @@ export class TradeTable extends React.Component<any, any> {
       <AutoSizer>
         {({ width, height }) => (
           <Table
+            key="meow"
             ref={tableId}
             width={width}
             height={height}
@@ -27,6 +28,7 @@ export class TradeTable extends React.Component<any, any> {
             disableHeader={false}
           >
             <Column
+              key="meow"
               label="BID"
               cellDataGetter={({ rowData }) => rowData.price}
               cellRenderer={({ cellData }) => cellData}

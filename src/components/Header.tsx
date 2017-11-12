@@ -1,14 +1,20 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import sizing from '../util/sizing';
 
 const HeaderContainer = styled.div`
   display: flex;
   flex-display: row;
   align-items: center;
   justify-content: flex-start;
-  height: 6rem;
+  height: ${sizing.headerHeight};
+  min-height: ${sizing.headerHeight};
   padding-left: 4rem;
   background-image: linear-gradient(90deg, #4ba1f8 22%, rgba(141, 68, 247, 0.97) 100%);
+  @media (max-width: ${sizing.smallMediaQuery}) {
+    padding-left: 2rem;
+  }
 `;
 
 const HeaderLogo = styled.img`
@@ -47,7 +53,9 @@ const FilledButton = styled.button`
 
 const AppHeader = ({ logo, title, subtitle }: any) => (
   <HeaderContainer>
-    <HeaderLogo src={logo} alt="Conduit 0x Relayer Logo" />
+    <Link to="/">
+      <HeaderLogo src={logo} alt="Conduit 0x Relayer Logo" />
+    </Link>
     <HeaderDescriptionContainer>
       <HeaderTitle>{title}</HeaderTitle>
       {subtitle && <HeaderSubtitle>{subtitle}</HeaderSubtitle>}
