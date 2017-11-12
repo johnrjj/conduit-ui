@@ -9,6 +9,8 @@
     "date-fns": "^1.29.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
     "react-scripts-ts": "2.7.0",
     "react-virtualized": "^9.11.0",
     "react-vis": "^1.7.9",
@@ -29,6 +31,8 @@
     "@types/react": "^16.0.10",
     "@types/react-dom": "^16.0.1",
     "@types/react-virtualized": "^9.7.5",
+    "@types/react-router": "^4.0.17",
+    "@types/react-router-dom": "^4.2.1",
     "mock-socket": "^7.0.0",
     "prettier": "^1.7.4",
     "web3-typescript-typings": "^0.7.1"

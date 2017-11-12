@@ -1,15 +1,17 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import colors from '../util/colors';
+import sizing from '../util/sizing';
 
 const SidePanel = styled.div`
   display: flex;
   flex-direction: column;
   flex-basis: 20rem;
   flex-shrink: 2;
-  min-width: 12rem;
-  max-width: 20rem;
   border-left: 1px solid ${colors.greyWithBlueHue};
+  @media (max-width: ${sizing.smallMediaQuery}) {
+    flex-basis: inherit;
+  }
 `;
 
 const SidePanelHeader = styled.div`
