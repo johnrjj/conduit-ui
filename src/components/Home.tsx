@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 
 const GridContainer = styled.div`
   margin: 4rem;
+  height: 100%;
 `;
 
 const Grid = styled.div`

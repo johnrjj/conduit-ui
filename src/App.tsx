@@ -83,28 +83,33 @@ class App extends Component<AppProps | any, AppState> {
           ) : !hasLoadedTokens ? (
             <LoadingScreen />
           ) : (
-            <Switch>
-              <Route
-                path="/orderbook/:token_pair"
-                render={props => (
-                  <Orderbook
-                    tokens={tokens}
-                    tokenPairs={tokenPairs}
-                    baseTokenAddress={
-                      '0x1dad4783cf3fe3085c1426157ab175a6119a04ba' /*props.match['token_pair']*/
-                    }
-                    quoteTokenAddress={
-                      '0x05d090b51c40b020eab3bfcb6a2dff130df22e9c' /*props.match['token_pair']*/
-                    }
-                    wsEndpoint={wsEndpoint}
-                    {...props}
-                  />
-                )}
-              />
-              <Route exact path="/" render={props => <Home tokenPairs={tokenPairs} {...props} />} />
-            </Switch>
+            <AppContent>
+              <Switch>
+                <Route
+                  path="/orderbook/:token_pair"
+                  render={props => (
+                    <Orderbook
+                      tokens={tokens}
+                      tokenPairs={tokenPairs}
+                      baseTokenAddress={
+                        '0x1dad4783cf3fe3085c1426157ab175a6119a04ba' /*props.match['token_pair']*/
+                      }
+                      quoteTokenAddress={
+                        '0x05d090b51c40b020eab3bfcb6a2dff130df22e9c' /*props.match['token_pair']*/
+                      }
+                      wsEndpoint={wsEndpoint}
+                      {...props}
+                    />
+                  )}
+                />
+                <Route
+                  exact
+                  path="/"
+                  render={props => <Home tokenPairs={tokenPairs} {...props} />}
+                />
+              </Switch>
+            </AppContent>
           )}
-
           <AppFooter>
             <TimeSince
               date={lastWebSocketUpdate}

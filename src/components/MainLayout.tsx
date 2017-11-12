@@ -12,7 +12,7 @@ const AppContainer = styled.div`
 
 const AppContent = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex: 1;
 `;
 
