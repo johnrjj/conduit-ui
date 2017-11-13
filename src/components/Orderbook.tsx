@@ -6,8 +6,9 @@ import { ZeroEx, SignedOrder, Token } from '0x.js';
 import { RBTree } from 'bintrees';
 import { subHours, subMinutes, subDays } from 'date-fns';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
-import { MainPanel, ContentHeader } from './MainLayout';
+import { MainPanel } from './MainLayout';
 import { TradeTable } from './TradeTable';
+import { ContentHeader } from './Common';
 import { ZeroExFeed, OrderbookSnapshot } from './ZeroExFeed';
 import {
   SidePanel,
@@ -19,6 +20,7 @@ import {
   SidePanelListItemSwapIcon,
 } from './SidePanel';
 import sizing from '../util/sizing';
+import { TokenPair } from '../types';
 import { WS } from './WebSocket';
 
 const BidsAndAsksTablesContainer = styled.div`
@@ -35,7 +37,7 @@ const IndividualTableContainer = styled.div`
   display: flex;
   flex: 1;
   @media (min-width: ${sizing.mediumMediaQuery}) {
-    padding-right: 1rem;
+    padding-right: ${sizing.spacingSmall};
   }
 `;
 
@@ -47,23 +49,10 @@ const OrderbookContainer = styled.div`
   }
 `;
 
-export type OrderType = 'bid' | 'ask';
-
-export interface TokenPair {
-  [key: string]: {
-    address: string;
-    maxAmount: string;
-    minAmount: string;
-    precision: number;
-  };
-}
-
 export interface OrderbookProps {
   wsEndpoint: string;
-  tokens: Array<Token>;
-  tokenPairs: Array<TokenPair>;
-  baseTokenAddress: string;
-  quoteTokenAddress: string;
+  baseToken: Token;
+  quoteToken: Token;
 }
 export interface OrderbookState {
   connectionStatus: 'connected' | 'disconnected' | 'loading';
@@ -73,8 +62,6 @@ export interface OrderbookState {
   orderDetailsMap: WeakMap<SignedOrder, OrderDetails>;
   recentFills: Array<any>;
 }
-
-export interface Token {}
 
 export interface OrderDetails {
   price: BigNumber;
@@ -95,12 +82,12 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
   }
 
   componentDidMount() {
-    console.log('orderbook mounted');
     this.feed &&
-      this.feed.subscribeToOrderbook(this.props.baseTokenAddress, this.props.quoteTokenAddress);
+      this.feed.subscribeToOrderbook(this.props.baseToken.address, this.props.quoteToken.address);
   }
 
-  handleSocketMessage = (_: MessageEvent) => this.setState({ lastWebSocketUpdate: new Date() });
+  handleSocketMessage = (_: MessageEvent) =>
+    console.log(_) || this.setState({ lastWebSocketUpdate: new Date() });
 
   handleSocketClose = () =>
     this.setState({ lastWebSocketUpdate: undefined, connectionStatus: 'disconnected' });
@@ -115,27 +102,28 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
 
   handleOrderbookSnapshot = (snapshot: OrderbookSnapshot) => {
     const { bids, asks } = snapshot;
-    const { baseTokenAddress, quoteTokenAddress } = this.props;
-    const baseSymbol = this.getTokenSymbol(baseTokenAddress);
-    const quoteSymbol = this.getTokenSymbol(quoteTokenAddress);
+    const { baseToken, quoteToken } = this.props;
 
     bids.forEach(bid => {
-      const orderDetail = this.computeOrderDetails(bid, baseTokenAddress, quoteTokenAddress);
+      const orderDetail = this.computeOrderDetails(bid, baseToken.address, quoteToken.address);
       console.log(
-        `BUY: ${orderDetail.baseUnitAmount} ${baseSymbol} for ${orderDetail.quoteUnitAmount} ${
-          quoteSymbol
-        } (@ ${orderDetail.price} ${quoteSymbol} for each ${baseSymbol})`
+        `BUY: ${orderDetail.baseUnitAmount} ${baseToken.symbol} for ${
+          orderDetail.quoteUnitAmount
+        } ${quoteToken.symbol} (@ ${orderDetail.price} ${quoteToken.symbol} for each ${
+          baseToken.symbol
+        })`
       );
       this.addOrderDetails(bid, orderDetail);
-      console.log('adding bid', bid);
       this.addBid(bid);
     });
     asks.forEach(ask => {
-      const orderDetail = this.computeOrderDetails(ask, baseTokenAddress, quoteTokenAddress);
+      const orderDetail = this.computeOrderDetails(ask, baseToken.address, quoteToken.address);
       console.log(
-        `SELL: ${orderDetail.baseUnitAmount} ${baseSymbol} for ${orderDetail.quoteUnitAmount} ${
-          quoteSymbol
-        } (@ ${orderDetail.price} ${quoteSymbol} for each ${baseSymbol})`
+        `SELL: ${orderDetail.baseUnitAmount} ${baseToken.symbol} for ${
+          orderDetail.quoteUnitAmount
+        } ${quoteToken.symbol} (@ ${orderDetail.price} ${quoteToken.symbol} for each ${
+          baseToken.symbol
+        })`
       );
       this.addOrderDetails(ask, orderDetail);
       this.addAsk(ask);
@@ -146,9 +134,7 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
     this.setState((prevState: OrderbookState) => {
       const { orderDetailsMap } = prevState;
       orderDetailsMap.set(signedOrder, orderDetails);
-      return {
-        orderDetailsMap,
-      };
+      return { orderDetailsMap };
     });
   }
 
@@ -163,8 +149,7 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
   private addBid(bid: SignedOrder) {
     this.setState((prevState: OrderbookState) => {
       const { bids } = prevState;
-      const foo = bids.insert(bid);
-      console.log('REEEE', foo);
+      bids.insert(bid);
       return { bids };
     });
   }
@@ -174,8 +159,8 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
     if (!data) {
       const orderDetail = this.computeOrderDetails(
         signedOrder,
-        this.props.baseTokenAddress,
-        this.props.quoteTokenAddress
+        this.props.baseToken.address,
+        this.props.quoteToken.address
       );
       this.addOrderDetails(signedOrder, orderDetail);
       data = orderDetail;
@@ -183,27 +168,21 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
     return data.price;
   };
 
-  getToken(address: string) {
-    const token = this.props.tokens.find(t => t.address === address);
-    if (!token) {
-      throw new Error('Could not find token');
-    }
-    return token;
-  }
-
-  getTokenSymbol(address: string) {
-    const token = this.getToken(address);
-    const symbol = token.symbol;
-    return symbol;
-  }
-
-  private computeOrderDetails = (
+  private computeOrderDetails(
     order: SignedOrder,
     baseTokenAddress: string,
     quoteTokenAddress: string
-  ) => {
-    const makerToken = this.getToken(order.makerTokenAddress);
-    const takerToken = this.getToken(order.takerTokenAddress);
+  ) {
+    const makerToken =
+      this.props.baseToken.address === order.makerTokenAddress
+        ? this.props.baseToken
+        : this.props.quoteToken;
+
+    const takerToken =
+      this.props.baseToken.address === order.takerTokenAddress
+        ? this.props.baseToken
+        : this.props.quoteToken;
+
     const makerUnitAmount = ZeroEx.toUnitAmount(
       new BigNumber(order.makerTokenAmount),
       makerToken.decimals
@@ -217,15 +196,13 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
     const isBid = baseTokenAddress === makerToken.address;
     const baseUnitAmount = isBid ? makerUnitAmount : takerUnitAmount;
     const quoteUnitAmount = isBid ? takerUnitAmount : makerUnitAmount;
-
     const price: BigNumber = quoteUnitAmount.div(baseUnitAmount);
-
     return {
       price,
       baseUnitAmount,
       quoteUnitAmount,
     };
-  };
+  }
 
   // a - b (todo consolidate these two functions)
   private sortOrdersDesc = (a: SignedOrder, b: SignedOrder) => {
@@ -257,36 +234,56 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
   };
 
   private getMidMarketPrice = (bids: RBTree<SignedOrder>, asks: RBTree<SignedOrder>): BigNumber => {
+    // Bids and asks currently exist
     if (bids && bids.size > 0 && asks && asks.size > 0) {
-      const lowestBid = bids.min();
-      const highestAsk = asks.max();
-      console.log(lowestBid, highestAsk);
-
-      const midMarketPrice = this.getPriceForSignedOrder(lowestBid)
-        .plus(this.getPriceForSignedOrder(highestAsk))
+      const currentHighestBid = bids.max(); // highest 'buy'
+      const currentLowestAsk = asks.min(); // lowest 'sell'
+      console.log(currentHighestBid, currentLowestAsk);
+      const midMarketPrice = this.getPriceForSignedOrder(currentHighestBid)
+        .plus(this.getPriceForSignedOrder(currentLowestAsk))
         .div(2);
       return midMarketPrice;
     }
-    return new BigNumber(0);
+    // No bids exist, use ask price
+    if (asks && asks.size > 0) {
+      return this.getPriceForSignedOrder(asks.min());
+    }
+    // No bids exist, no one is selling, no price right now...
+    return new BigNumber(NaN);
   };
 
   render() {
+    console.log(this.state);
+    const { wsEndpoint } = this.props;
     const { lastWebSocketUpdate, connectionStatus, asks, bids } = this.state;
+    let asksInOrder: Array<SignedOrder> = [];
+    asks.each(a => asksInOrder.push(a));
+    let bidsInOrder: Array<SignedOrder> = [];
+    bids.each(b => bidsInOrder.push(b));
     const midMarketPrice = this.getMidMarketPrice(bids, asks);
     console.log(
       `Right now one MKR is being sold for mid-market price of ${midMarketPrice.toString()} WETH`
     );
     console.log(this.state);
-    return [
+    return (
       <OrderbookContainer>
+        <ZeroExFeed
+          ref={ref => (this.feed = ref)}
+          url={wsEndpoint}
+          onMessage={this.handleSocketMessage}
+          onClose={this.handleSocketClose}
+          onOrderbookSnapshot={this.handleOrderbookSnapshot}
+          onOrderbookUpdate={this.handleOrderbookUpdate}
+          onOrderbookFill={this.handleOrderbookFill}
+        />
         <MainPanel>
           <ContentHeader>Open Orders</ContentHeader>
           <BidsAndAsksTablesContainer>
             <IndividualTableContainer key="asksTable">
-              <TradeTable tableId="asks" data={this.state.asks} />
+              <TradeTable tableId="asks" data={asksInOrder} />
             </IndividualTableContainer>
             <IndividualTableContainer key="bidsTable">
-              <TradeTable tableId="bids" data={this.state.bids} />
+              <TradeTable tableId="bids" data={bidsInOrder} />
             </IndividualTableContainer>
           </BidsAndAsksTablesContainer>
         </MainPanel>
@@ -300,9 +297,22 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
             </SidePanelListItem>
           </SidePanelContent>
         </SidePanel>
-      </OrderbookContainer>,
-    ];
+      </OrderbookContainer>
+    );
   }
 }
 
 export { Orderbook };
+
+// @keyframes highlight {
+//   0% {
+//     background: red
+//   }
+//   100% {
+//     background: none;
+//   }
+// }
+
+// #highlight:target {
+//   animation: highlight 1s;
+// }

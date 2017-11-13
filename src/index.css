@@ -16,6 +16,10 @@ body {
   width: 100%;
 }
 
+h1 {
+  margin: 0;
+}
+
 #root {
   height: 100%;
   width: 100%;
@@ -42,7 +46,7 @@ a {
 }
 
 .ReactVirtualized__Table__headerRow {
-  padding-left: 4rem;
+  /* padding-left: 4rem; */
   border-bottom: 1px solid #d2d2d2;
   border-top: 1px solid #d2d2d2;
   border-left: 1px solid #d2d2d2;
@@ -53,7 +57,7 @@ a {
 }
 
 .ReactVirtualized__Table__row {
-  padding-left: 4rem;
+  /* padding-left: 4rem; */
   border-bottom: 1px solid #d2d2d2;
   border-left: 1px solid #d2d2d2;
   border-right: 1px solid #d2d2d2;

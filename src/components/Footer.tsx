@@ -10,7 +10,7 @@ const AppFooter = styled.footer`
   height: ${sizing.footerHeight};
   width: 100%;
   padding-left: 2rem;
-  border-top: 1px solid ${colors.greyWithBlueHue};
+  border-top: 1px solid ${colors.greyBorder};
   font-weight: 100;
 `;
 

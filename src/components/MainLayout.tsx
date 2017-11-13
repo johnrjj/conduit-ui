@@ -16,34 +16,18 @@ const AppContent = styled.div`
   flex: 1;
 `;
 
-const MainPanel = styled.div`
+const MainPanel = styled.section`
   display: flex;
   flex: 1;
   flex-basis: 40rem;
   flex-direction: column;
-  margin: 0 3rem 0 4rem; // 3rem on right for temp gutter fix
+  margin: 0 3rem 0 ${sizing.spacingLarge}; // 3rem on right for temp gutter fix
   @media (max-width: ${sizing.mediumMediaQuery}) {
-    margin: 0 4rem 0 4rem;
+    margin: 0 ${sizing.spacingLarge};
   }
   @media (max-width: ${sizing.smallMediaQuery}) {
-    margin: 0 2rem 0 2rem;
+    margin: 0 ${sizing.spacingMedium};
   }
 `;
 
-const ContentHeader = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-  align-items: center;
-  font-size: 2rem;
-  color: ${colors.darkBlue};
-  height: 6rem;
-  flex-basis: 6rem;
-  max-height: 6rem;
-  padding-top: 0rem;
-  font-weight: 100;
-  letter-spacing: 0.5px;
-  background: #ffffff;
-`;
-
-export { AppContainer, AppContent, MainPanel, ContentHeader };
+export { AppContainer, AppContent, MainPanel };

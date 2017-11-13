@@ -33,18 +33,9 @@ export interface ZeroExFeedProps {
   onOrderbookFill(fill: RelayerSocketResponse<any>): void;
 }
 
-// export interface ZeroExFeedState {
-//   ws?: WebSocket;
-// }
-
 export class ZeroExFeed extends Component<ZeroExFeedProps> {
   ws: WebSocket;
-  constructor(props) {
-    super(props);
-    // this.state = {
-    //   ws: undefined,
-    // }
-  }
+
   componentDidMount() {
     this.handleWebSocketSetup();
   }

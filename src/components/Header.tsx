@@ -3,17 +3,17 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import sizing from '../util/sizing';
 
-const HeaderContainer = styled.div`
+const HeaderContainer = styled.header`
   display: flex;
   flex-display: row;
   align-items: center;
   justify-content: flex-start;
   height: ${sizing.headerHeight};
   min-height: ${sizing.headerHeight};
-  padding-left: 4rem;
+  padding-left: ${sizing.spacingLarge};
   background-image: linear-gradient(90deg, #4ba1f8 22%, rgba(141, 68, 247, 0.97) 100%);
   @media (max-width: ${sizing.smallMediaQuery}) {
-    padding-left: 2rem;
+    padding-left: ${sizing.spacingSmall};
   }
 `;
 
