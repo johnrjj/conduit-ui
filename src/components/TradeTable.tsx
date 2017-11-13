@@ -16,6 +16,7 @@ export class TradeTable extends React.Component<TradeTableProps, any> {
     return (
       <AutoSizer>
         {({ width, height }) => (
+          <div>
           <Table
             ref={tableId}
             width={width}
@@ -54,6 +55,7 @@ export class TradeTable extends React.Component<TradeTableProps, any> {
               flexGrow={1}
             />
           </Table>
+          </div>
         )}
       </AutoSizer>
     );

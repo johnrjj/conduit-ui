@@ -23,6 +23,9 @@ h1 {
 #root {
   height: 100%;
   width: 100%;
+  background-color: #FCFBFE;
+  /* background-image: linear-gradient(90deg, #4ba1f8 22%, rgba(141, 68, 247, 0.97) 100%); */
+  
 }
 
 a { 
@@ -41,6 +44,11 @@ a {
   font-weight: 100;
 }
 
+
+.ReactVirtualized__Table__Grid {
+  background-color: white;
+}
+
 .ReactVirtualized__Table__headerColumn:first-of-type, .ReactVirtualized__Table__rowColumn:first-of-type {
   margin-left: 0;
 }
@@ -52,7 +60,7 @@ a {
   border-left: 1px solid #d2d2d2;
   border-right: 1px solid #d2d2d2;
   font-weight: 500;
-  background-color: #F7F9FC;
+  /* background-color: #F7F9FC; */
   color: #34445A;
 }
 

@@ -56,7 +56,6 @@ export interface OrderbookProps {
 }
 export interface OrderbookState {
   connectionStatus: 'connected' | 'disconnected' | 'loading';
-  lastWebSocketUpdate?: Date;
   bids: RBTree<SignedOrder>;
   asks: RBTree<SignedOrder>;
   orderDetailsMap: WeakMap<SignedOrder, OrderDetails>;
@@ -68,7 +67,7 @@ export interface OrderDetails {
 }
 
 // note, app props is bugging out with ts right now (known ts-react issue), setting to any
-class Orderbook extends Component<OrderbookProps, OrderbookState> {
+class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   feed: ZeroExFeed | null;
   constructor(props) {
     super(props);
@@ -86,11 +85,9 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
       this.feed.subscribeToOrderbook(this.props.baseToken.address, this.props.quoteToken.address);
   }
 
-  handleSocketMessage = (_: MessageEvent) =>
-    console.log(_) || this.setState({ lastWebSocketUpdate: new Date() });
+  handleSocketMessage = (_: MessageEvent) => {};
 
-  handleSocketClose = () =>
-    this.setState({ lastWebSocketUpdate: undefined, connectionStatus: 'disconnected' });
+  handleSocketClose = () => this.setState({ connectionStatus: 'disconnected' });
 
   handleOrderbookUpdate(orderbookUpdate) {
     console.log(orderbookUpdate);
@@ -103,32 +100,23 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
   handleOrderbookSnapshot = (snapshot: OrderbookSnapshot) => {
     const { bids, asks } = snapshot;
     const { baseToken, quoteToken } = this.props;
-
-    bids.forEach(bid => {
-      const orderDetail = this.computeOrderDetails(bid, baseToken.address, quoteToken.address);
-      console.log(
-        `BUY: ${orderDetail.baseUnitAmount} ${baseToken.symbol} for ${
-          orderDetail.quoteUnitAmount
-        } ${quoteToken.symbol} (@ ${orderDetail.price} ${quoteToken.symbol} for each ${
-          baseToken.symbol
-        })`
-      );
-      this.addOrderDetails(bid, orderDetail);
-      this.addBid(bid);
-    });
-    asks.forEach(ask => {
-      const orderDetail = this.computeOrderDetails(ask, baseToken.address, quoteToken.address);
-      console.log(
-        `SELL: ${orderDetail.baseUnitAmount} ${baseToken.symbol} for ${
-          orderDetail.quoteUnitAmount
-        } ${quoteToken.symbol} (@ ${orderDetail.price} ${quoteToken.symbol} for each ${
-          baseToken.symbol
-        })`
-      );
-      this.addOrderDetails(ask, orderDetail);
-      this.addAsk(ask);
-    });
+    bids.forEach(this.addBidToOrderbook);
+    asks.forEach(this.addAskToOrderbook);
   };
+
+  private addAskToOrderbook = (ask: SignedOrder) => {
+    const { baseToken, quoteToken } = this.props;    
+    const orderDetail = this.computeOrderDetails(ask, baseToken.address, quoteToken.address);
+    this.addOrderDetails(ask, orderDetail);
+    this.addAsk(ask);
+  }
+
+  private addBidToOrderbook = (bid: SignedOrder) => {
+    const { baseToken, quoteToken } = this.props;    
+    const orderDetail = this.computeOrderDetails(bid, baseToken.address, quoteToken.address);
+    this.addOrderDetails(bid, orderDetail);
+    this.addBid(bid);
+  }
 
   private addOrderDetails(signedOrder: SignedOrder, orderDetails: OrderDetails) {
     this.setState((prevState: OrderbookState) => {
@@ -204,20 +192,6 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
     };
   }
 
-  // a - b (todo consolidate these two functions)
-  private sortOrdersDesc = (a: SignedOrder, b: SignedOrder) => {
-    if (ZeroEx.getOrderHashHex(a) === ZeroEx.getOrderHashHex(b)) {
-      return 0;
-    }
-    const priceA = this.getPriceForSignedOrder(a);
-    const priceB = this.getPriceForSignedOrder(b);
-    const priceDif = priceA.sub(priceB);
-    if (!priceDif.isZero()) {
-      return priceDif.toNumber();
-    }
-    return 1;
-  };
-
   // b - a
   private sortOrdersAsc = (a: SignedOrder, b: SignedOrder) => {
     if (ZeroEx.getOrderHashHex(a) === ZeroEx.getOrderHashHex(b)) {
@@ -232,6 +206,11 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
     }
     return -1;
   };
+
+  // a - b
+  private sortOrdersDesc = (a: SignedOrder, b: SignedOrder) => {
+    return this.sortOrdersAsc(b, a);
+  }
 
   private getMidMarketPrice = (bids: RBTree<SignedOrder>, asks: RBTree<SignedOrder>): BigNumber => {
     // Bids and asks currently exist
@@ -255,7 +234,7 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
   render() {
     console.log(this.state);
     const { wsEndpoint } = this.props;
-    const { lastWebSocketUpdate, connectionStatus, asks, bids } = this.state;
+    const { connectionStatus, asks, bids } = this.state;
     let asksInOrder: Array<SignedOrder> = [];
     asks.each(a => asksInOrder.push(a));
     let bidsInOrder: Array<SignedOrder> = [];
@@ -278,6 +257,7 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
         />
         <MainPanel>
           <ContentHeader>Open Orders</ContentHeader>
+          <ContentHeader>{midMarketPrice.toFixed(5)}</ContentHeader>
           <BidsAndAsksTablesContainer>
             <IndividualTableContainer key="asksTable">
               <TradeTable tableId="asks" data={asksInOrder} />
@@ -302,7 +282,7 @@ class Orderbook extends Component<OrderbookProps, OrderbookState> {
   }
 }
 
-export { Orderbook };
+export { TokenPairOrderbook };
 
 // @keyframes highlight {
 //   0% {

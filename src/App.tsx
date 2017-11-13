@@ -11,7 +11,7 @@ import { AppHeader } from './components/Header';
 import { Home } from './components/Home';
 import { LoadingScreen } from './components/Loading';
 import { ConnectionError } from './components/ConnectionError';
-import { Orderbook } from './components/Orderbook';
+import { TokenPairOrderbook } from './components/TokenPairOrderbook';
 import { TimeSince } from './components/TimeSince';
 import { AppFooter } from './components/Footer';
 import { TokenPair } from './types';
@@ -100,7 +100,7 @@ class App extends Component<AppProps | any, AppState> {
                     const ticker = props.match.params.tokenPair;
                     const { baseToken, quoteToken } = this.getBaseAndQuoteTokenFromTicker(ticker);
                     return (
-                      <Orderbook
+                      <TokenPairOrderbook
                         baseToken={baseToken}
                         quoteToken={quoteToken}
                         wsEndpoint={wsEndpoint}

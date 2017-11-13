@@ -14,9 +14,8 @@ const ContentHeader = styled.h1`
   max-height: 6rem;
   padding-top: 0;
   font-size: 2rem;
-  font-weight: 100;
+  font-weight: 300;
   letter-spacing: 0.5px;
-  background: #ffffff;
 `;
 
 export { ContentHeader };

@@ -7,7 +7,7 @@ import colors from '../util/colors';
 import sizing from '../util/sizing';
 
 const TokenPairSelectContainer = styled.div`
-  margin: 0 ${sizing.spacingLarge};
+  margin: 0 ${sizing.spacingLarge};  
 `;
 
 const TokenPairGrid = styled.div`
@@ -22,14 +22,14 @@ const Card = styled.div`
   display: relative;
   height: 8rem;
   width: 16rem;
-  background-color: #f5f8fc;
-  color: #34445a;
+  background-color: ${colors.white};
+  color: ${colors.darkBlue};
   font-size: 1.5rem;
-  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
   border-radius: 0.5rem;
   overflow: hidden;
   padding: 1rem 0;
   cursor: pointer;
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
   :hover {
     transform: translateY(-1px);
     box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
