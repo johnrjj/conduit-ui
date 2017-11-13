@@ -43,8 +43,8 @@ class App extends Component<AppProps | any, AppState> {
   }
 
   async componentDidMount() {
-    const tokens = await this.getTokens();
-    const tokenPairs = await this.getTokenPairs();
+    const tokens = await this.fetchTokens();
+    const tokenPairs = await this.fetchTokenPairs();
     this.setState({
       tokens,
       tokenPairs,
@@ -52,22 +52,31 @@ class App extends Component<AppProps | any, AppState> {
     this.setState({ lastWebSocketUpdate: new Date(), connectionStatus: 'connected' });
   }
 
-  private getTokenSymbol(address: string) {
-    const token = this.state.tokens.find(x => x.address === address);
-    const symbol = token.symbol;
-    return symbol;
-  }
-
-  private getTokens = async (): Promise<Array<Token>> => {
+  private fetchTokens = async (): Promise<Array<Token>> => {
     const res = await fetch(`${this.props.restEndpoint}/tokens`);
     const json = res.json();
     return json;
   };
 
-  private getTokenPairs = async (): Promise<Array<TokenPair>> => {
+  private fetchTokenPairs = async (): Promise<Array<TokenPair>> => {
     const res = await fetch(`${this.props.restEndpoint}/token_pairs`);
     const json = res.json();
     return json;
+  };
+
+  private getTokenFromSymbol = (symbol: string) => {
+    return this.state.tokens.find(t => t.symbol === symbol);
+  };
+
+  private getBaseAndQuoteTokenFromTicker = (ticker: string) => {
+    const tickerParts = ticker.split('-');
+    const [baseTokenSymbol, quoteTokenSymbol] = tickerParts;
+    const baseToken = this.getTokenFromSymbol(baseTokenSymbol);
+    const quoteToken = this.getTokenFromSymbol(quoteTokenSymbol);
+    return {
+      baseToken,
+      quoteToken,
+    };
   };
 
   render() {
@@ -86,21 +95,19 @@ class App extends Component<AppProps | any, AppState> {
             <AppContent>
               <Switch>
                 <Route
-                  path="/orderbook/:token_pair"
-                  render={props => (
-                    <Orderbook
-                      tokens={tokens}
-                      tokenPairs={tokenPairs}
-                      baseTokenAddress={
-                        '0x1dad4783cf3fe3085c1426157ab175a6119a04ba' /*props.match['token_pair']*/
-                      }
-                      quoteTokenAddress={
-                        '0x05d090b51c40b020eab3bfcb6a2dff130df22e9c' /*props.match['token_pair']*/
-                      }
-                      wsEndpoint={wsEndpoint}
-                      {...props}
-                    />
-                  )}
+                  path="/orderbook/:tokenPair"
+                  render={props => {
+                    const ticker = props.match.params.tokenPair;
+                    const { baseToken, quoteToken } = this.getBaseAndQuoteTokenFromTicker(ticker);
+                    return (
+                      <Orderbook
+                        baseToken={baseToken}
+                        quoteToken={quoteToken}
+                        wsEndpoint={wsEndpoint}
+                        {...props}
+                      />
+                    );
+                  }}
                 />
                 <Route
                   exact
@@ -123,22 +130,3 @@ class App extends Component<AppProps | any, AppState> {
 }
 
 export default App;
-
-// @keyframes highlight {
-//   0% {
-//     background: red
-//   }
-//   100% {
-//     background: none;
-//   }
-// }
-
-// #highlight:target {
-//   animation: highlight 1s;
-// }
-
-// const Child = ({ match }) => (
-//   <div>
-//     <h3>ID: {match.params.token_pair}</h3>
-//   </div>
-// );

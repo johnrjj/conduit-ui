@@ -1,6 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import colors from '../util/colors';
+import sizing from '../util/sizing';
 
 const CenterHorizontallyAndVertically = styled.div`
   display: flex;
@@ -8,7 +9,7 @@ const CenterHorizontallyAndVertically = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-bottom: 4rem;
+  margin-bottom: ${sizing.spacingLarge};
 `;
 
 const LoadingTitle = styled.h1`

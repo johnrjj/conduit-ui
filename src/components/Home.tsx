@@ -1,20 +1,21 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import colors from '../util/colors';
-import { TokenPair } from '../types';
-
 import { Link } from 'react-router-dom';
+import { TokenPair } from '../types';
+import { ContentHeader } from './Common';
+import colors from '../util/colors';
+import sizing from '../util/sizing';
 
-const GridContainer = styled.div`
-  margin: 4rem;
+const TokenPairSelectContainer = styled.div`
+  margin: 0 ${sizing.spacingLarge};
 `;
 
-const Grid = styled.div`
+const TokenPairGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, 17rem);
-  grid-gap: 2rem;
+  grid-gap: ${sizing.spacingMedium};
   justify-items: center;
-  justify-content: space-evenly;
+  // justify-content: space-evenly;
 `;
 
 const Card = styled.div`
@@ -82,13 +83,14 @@ const TokenPairSelect = ({ tokenPair }: { tokenPair: TokenPair }) => {
 };
 
 const Home = ({ tokenPairs }: { tokenPairs: Array<TokenPair> }) => (
-  <GridContainer>
-    <Grid>
+  <TokenPairSelectContainer>
+    <ContentHeader>Select a token pair</ContentHeader>
+    <TokenPairGrid>
       {tokenPairs.map(tokenPair => (
         <TokenPairSelect tokenPair={tokenPair} key={computeTokenPairTicker(tokenPair)} />
       ))}
-    </Grid>
-  </GridContainer>
+    </TokenPairGrid>
+  </TokenPairSelectContainer>
 );
 
 export { Home };

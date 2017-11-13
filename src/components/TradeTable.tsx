@@ -1,23 +1,22 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import { SignedOrder } from '0x.js';
 import { Table, AutoSizer, Column } from 'react-virtualized';
 
-export class TradeTable extends React.Component<any, any> {
-  constructor(props: { orders: any }) {
-    super(props);
-    this._getDatum = this._getDatum.bind(this);
-  }
+export interface TradeTableProps {
+  data: Array<SignedOrder>;
+  tableId: string;
+}
 
+export class TradeTable extends React.Component<TradeTableProps, any> {
   render() {
     const { data, tableId } = this.props;
-    console.log(data);
     const rowGetter = ({ index }: { index: number }) => this._getDatum(data, index);
     const rowCount = (data && data.length) || 0;
     return (
       <AutoSizer>
         {({ width, height }) => (
           <Table
-            key="meow"
             ref={tableId}
             width={width}
             height={height}
@@ -28,11 +27,29 @@ export class TradeTable extends React.Component<any, any> {
             disableHeader={false}
           >
             <Column
-              key="meow"
-              label="BID"
-              cellDataGetter={({ rowData }) => rowData.price}
+              key="price"
+              label="Price"
+              cellDataGetter={({ rowData }) => rowData.makerTokenAmount}
               cellRenderer={({ cellData }) => cellData}
               dataKey="price"
+              width={120}
+              flexGrow={1}
+            />
+            <Column
+              key="baseAmount"
+              label="Base Token"
+              cellDataGetter={({ rowData }) => rowData.makerTokenAmount}
+              cellRenderer={({ cellData }) => cellData}
+              dataKey="baseTokenAmount"
+              width={120}
+              flexGrow={1}
+            />
+            <Column
+              key="quoteAmount"
+              label="Quote Token"
+              cellDataGetter={({ rowData }) => rowData.takerTokenAmount}
+              cellRenderer={({ cellData }) => cellData}
+              dataKey="quoteTokenAmount"
               width={120}
               flexGrow={1}
             />
@@ -42,7 +59,7 @@ export class TradeTable extends React.Component<any, any> {
     );
   }
 
-  _getDatum(arr: Array<any>, idx: number) {
+  _getDatum = (arr: Array<any>, idx: number) => {
     return arr[idx];
-  }
+  };
 }

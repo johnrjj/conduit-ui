@@ -4,7 +4,6 @@ import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 import 'react-virtualized/styles.css';
-import 'react-vis/dist/style.css';
 
 const API_ENDPOINT_ROOT =
   process.env.NODE_ENV === '!development'

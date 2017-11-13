@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import colors from '../util/colors';
 import sizing from '../util/sizing';
 
-const SidePanel = styled.div`
+const SidePanel = styled.aside`
   display: flex;
   flex-direction: column;
   flex-basis: 20rem;
   flex-shrink: 2;
-  border-left: 1px solid ${colors.greyWithBlueHue};
+  border-left: 1px solid ${colors.greyBorder};
   @media (max-width: ${sizing.smallMediaQuery}) {
     flex-basis: inherit;
   }
@@ -19,14 +19,14 @@ const SidePanelHeader = styled.div`
   align-items: center;
   font-size: 1.5rem;
   padding-left: 1rem;
-  color: #6b7c93;
+  color: ${colors.darkGrey};
   height: 4rem;
   align-items: center;
   flex-basis: 4rem;
   max-height: 4rem;
-  border-bottom: 1px solid ${colors.greyWithBlueHue};
+  border-bottom: 1px solid ${colors.greyBorder};
   font-weight: 100;
-  background: #e6ebf1;
+  background: ${colors.lightGrey};
 `;
 
 const SidePanelContent = styled.div`
@@ -44,7 +44,7 @@ const SidePanelListItem = styled.div`
   height: 3rem;
   font-weight: 100;
   background-color: inherit;
-  border-bottom: 1px solid ${colors.greyWithBlueHue};
+  border-bottom: 1px solid ${colors.greyBorder};
 `;
 
 const SidePanelListItemMaker = styled.div`
