@@ -3,7 +3,6 @@ import * as ReactDOM from 'react-dom';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
-import 'react-virtualized/styles.css';
 
 const API_ENDPOINT_ROOT =
   process.env.NODE_ENV === '!development'

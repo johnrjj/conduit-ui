@@ -6,10 +6,10 @@ import { ZeroEx, SignedOrder, Token } from '0x.js';
 import { RBTree } from 'bintrees';
 import { subHours, subMinutes, subDays } from 'date-fns';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
-import { MainPanel } from './MainLayout';
-import { TradeTable } from './TradeTable';
-import { ContentHeader } from './Common';
-import { ZeroExFeed, OrderbookSnapshot } from './ZeroExFeed';
+import { MainPanel } from '../components/MainLayout';
+import { TradeTable } from '../components/TradeTable';
+import { ContentHeader } from '../components/Common';
+import { ZeroExFeed, OrderbookSnapshot } from '../components/ZeroExFeed';
 import {
   SidePanel,
   SidePanelHeader,
@@ -18,10 +18,9 @@ import {
   SidePanelListItemMaker,
   SidePanelListItemTaker,
   SidePanelListItemSwapIcon,
-} from './SidePanel';
+} from '../components/SidePanel';
 import sizing from '../util/sizing';
 import { TokenPair } from '../types';
-import { WS } from './WebSocket';
 
 const BidsAndAsksTablesContainer = styled.div`
   display: flex;
@@ -54,8 +53,9 @@ export interface OrderbookProps {
   baseToken: Token;
   quoteToken: Token;
 }
+
 export interface OrderbookState {
-  connectionStatus: 'connected' | 'disconnected' | 'loading';
+  loading: boolean;
   bids: RBTree<SignedOrder>;
   asks: RBTree<SignedOrder>;
   orderDetailsMap: WeakMap<SignedOrder, OrderDetails>;
@@ -66,13 +66,12 @@ export interface OrderDetails {
   price: BigNumber;
 }
 
-// note, app props is bugging out with ts right now (known ts-react issue), setting to any
 class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   feed: ZeroExFeed | null;
   constructor(props) {
     super(props);
     this.state = {
-      connectionStatus: 'loading',
+      loading: true,
       bids: new RBTree<SignedOrder>(this.sortOrdersAsc),
       asks: new RBTree<SignedOrder>(this.sortOrdersDesc),
       orderDetailsMap: new WeakMap<SignedOrder, OrderDetails>(),
@@ -87,8 +86,6 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
 
   handleSocketMessage = (_: MessageEvent) => {};
 
-  handleSocketClose = () => this.setState({ connectionStatus: 'disconnected' });
-
   handleOrderbookUpdate(orderbookUpdate) {
     console.log(orderbookUpdate);
   }
@@ -102,21 +99,24 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
     const { baseToken, quoteToken } = this.props;
     bids.forEach(this.addBidToOrderbook);
     asks.forEach(this.addAskToOrderbook);
+    if (this.state.loading) {
+      this.setState({ loading: false });
+    }
   };
 
   private addAskToOrderbook = (ask: SignedOrder) => {
-    const { baseToken, quoteToken } = this.props;    
+    const { baseToken, quoteToken } = this.props;
     const orderDetail = this.computeOrderDetails(ask, baseToken.address, quoteToken.address);
     this.addOrderDetails(ask, orderDetail);
     this.addAsk(ask);
-  }
+  };
 
   private addBidToOrderbook = (bid: SignedOrder) => {
-    const { baseToken, quoteToken } = this.props;    
+    const { baseToken, quoteToken } = this.props;
     const orderDetail = this.computeOrderDetails(bid, baseToken.address, quoteToken.address);
     this.addOrderDetails(bid, orderDetail);
     this.addBid(bid);
-  }
+  };
 
   private addOrderDetails(signedOrder: SignedOrder, orderDetails: OrderDetails) {
     this.setState((prevState: OrderbookState) => {
@@ -199,7 +199,6 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
     }
     const priceA = this.getPriceForSignedOrder(a);
     const priceB = this.getPriceForSignedOrder(b);
-    console.log(priceA, priceB);
     const priceDif = priceB.sub(priceB);
     if (!priceDif.isZero()) {
       return priceDif.toNumber();
@@ -210,14 +209,13 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   // a - b
   private sortOrdersDesc = (a: SignedOrder, b: SignedOrder) => {
     return this.sortOrdersAsc(b, a);
-  }
+  };
 
   private getMidMarketPrice = (bids: RBTree<SignedOrder>, asks: RBTree<SignedOrder>): BigNumber => {
     // Bids and asks currently exist
     if (bids && bids.size > 0 && asks && asks.size > 0) {
       const currentHighestBid = bids.max(); // highest 'buy'
       const currentLowestAsk = asks.min(); // lowest 'sell'
-      console.log(currentHighestBid, currentLowestAsk);
       const midMarketPrice = this.getPriceForSignedOrder(currentHighestBid)
         .plus(this.getPriceForSignedOrder(currentLowestAsk))
         .div(2);
@@ -231,39 +229,55 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
     return new BigNumber(NaN);
   };
 
+  private RBTreeToArray<T>(tree: RBTree<T>): Array<T> {
+    let arr: Array<T> = [];
+    tree.each(node => arr.push(node));
+    return arr;
+  }
+
   render() {
     console.log(this.state);
-    const { wsEndpoint } = this.props;
-    const { connectionStatus, asks, bids } = this.state;
-    let asksInOrder: Array<SignedOrder> = [];
-    asks.each(a => asksInOrder.push(a));
-    let bidsInOrder: Array<SignedOrder> = [];
-    bids.each(b => bidsInOrder.push(b));
-    const midMarketPrice = this.getMidMarketPrice(bids, asks);
-    console.log(
-      `Right now one MKR is being sold for mid-market price of ${midMarketPrice.toString()} WETH`
-    );
-    console.log(this.state);
+
+    const { wsEndpoint, baseToken, quoteToken } = this.props;
+    const { loading, asks, bids } = this.state;
+    const asksInOrder = this.RBTreeToArray(asks);
+    const bidsInOrder = this.RBTreeToArray(bids);
+    const midMarketPrice = this.getMidMarketPrice(bids, asks).toFixed(5);
+
     return (
       <OrderbookContainer>
         <ZeroExFeed
           ref={ref => (this.feed = ref)}
           url={wsEndpoint}
           onMessage={this.handleSocketMessage}
-          onClose={this.handleSocketClose}
           onOrderbookSnapshot={this.handleOrderbookSnapshot}
           onOrderbookUpdate={this.handleOrderbookUpdate}
           onOrderbookFill={this.handleOrderbookFill}
+          onClose={() => {}}
         />
         <MainPanel>
           <ContentHeader>Open Orders</ContentHeader>
-          <ContentHeader>{midMarketPrice.toFixed(5)}</ContentHeader>
+          <ContentHeader>{midMarketPrice}</ContentHeader>
           <BidsAndAsksTablesContainer>
-            <IndividualTableContainer key="asksTable">
-              <TradeTable tableId="asks" data={asksInOrder} />
+            <IndividualTableContainer>
+              <TradeTable
+                headerTitle={'Asks'}
+                baseTokenSymbol={baseToken.symbol}
+                quoteTokenSymbol={quoteToken.symbol}
+                data={asksInOrder}
+                loading={loading}
+                noOrdersText={'No asks found'}
+              />
             </IndividualTableContainer>
-            <IndividualTableContainer key="bidsTable">
-              <TradeTable tableId="bids" data={bidsInOrder} />
+            <IndividualTableContainer>
+              <TradeTable
+                headerTitle={'Bids'}
+                baseTokenSymbol={baseToken.symbol}
+                quoteTokenSymbol={quoteToken.symbol}
+                data={bidsInOrder}
+                loading={loading}
+                noOrdersText={'No bids found'}
+              />
             </IndividualTableContainer>
           </BidsAndAsksTablesContainer>
         </MainPanel>

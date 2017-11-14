@@ -5,15 +5,16 @@ import { BigNumber } from 'bignumber.js';
 import { ZeroEx, SignedOrder, Token } from '0x.js';
 import { RBTree } from 'bintrees';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
+import { Home } from './pages/Home';
+import { TokenPairOrderbook } from './pages/TokenPairOrderbook';
 import { AppContainer, AppContent } from './components/MainLayout';
 import { TradeTable } from './components/TradeTable';
 import { AppHeader } from './components/Header';
-import { Home } from './components/Home';
-import { LoadingScreen } from './components/Loading';
 import { ConnectionError } from './components/ConnectionError';
-import { TokenPairOrderbook } from './components/TokenPairOrderbook';
 import { TimeSince } from './components/TimeSince';
 import { AppFooter } from './components/Footer';
+import { Spinner } from './components/Spinner';
+import { CenterHorizontallyAndVertically } from './components/Common';
 import { TokenPair } from './types';
 const logo = require('./assets/icons/conduit-white.svg');
 const exchange = require('./assets/icons/exchange-black.svg');
@@ -28,8 +29,8 @@ export interface AppProps {
 export interface AppState {
   connectionStatus: 'connected' | 'disconnected' | 'loading';
   lastWebSocketUpdate?: Date;
-  tokens: Array<any>;
-  tokenPairs: Array<any>;
+  tokens: Array<Token>;
+  tokenPairs: Array<TokenPair>;
 }
 
 class App extends Component<AppProps | any, AppState> {
@@ -64,8 +65,12 @@ class App extends Component<AppProps | any, AppState> {
     return json;
   };
 
-  private getTokenFromSymbol = (symbol: string) => {
-    return this.state.tokens.find(t => t.symbol === symbol);
+  private getTokenFromSymbol = (symbol: string): Token => {
+    const token = this.state.tokens.find(t => t.symbol === symbol);
+    if (!token) {
+      throw new Error('Token not found');
+    }
+    return token;
   };
 
   private getBaseAndQuoteTokenFromTicker = (ticker: string) => {
@@ -90,7 +95,9 @@ class App extends Component<AppProps | any, AppState> {
           {connectionStatus === 'disconnected' ? (
             <ConnectionError />
           ) : !hasLoadedTokens ? (
-            <LoadingScreen />
+            <CenterSpinner>
+              <Spinner />
+            </CenterSpinner>
           ) : (
             <AppContent>
               <Switch>
@@ -128,5 +135,11 @@ class App extends Component<AppProps | any, AppState> {
     );
   }
 }
+
+const CenterSpinner = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 1;
+`;
 
 export default App;

@@ -1,13 +1,13 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { ContentHeader } from '../components/Common';
 import { TokenPair } from '../types';
-import { ContentHeader } from './Common';
 import colors from '../util/colors';
 import sizing from '../util/sizing';
 
 const TokenPairSelectContainer = styled.div`
-  margin: 0 ${sizing.spacingLarge};  
+  margin: 0 ${sizing.spacingLarge};
 `;
 
 const TokenPairGrid = styled.div`

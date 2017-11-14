@@ -23,10 +23,10 @@ const MainPanel = styled.section`
   flex-direction: column;
   margin: 0 3rem 0 ${sizing.spacingLarge}; // 3rem on right for temp gutter fix
   @media (max-width: ${sizing.mediumMediaQuery}) {
-    margin: 0 ${sizing.spacingLarge};
+    margin: 0 ${sizing.spacingMedium};
   }
   @media (max-width: ${sizing.smallMediaQuery}) {
-    margin: 0 ${sizing.spacingMedium};
+    margin: 0 ${sizing.spacingSmall};
   }
 `;
 

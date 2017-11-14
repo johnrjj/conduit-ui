@@ -18,4 +18,19 @@ const ContentHeader = styled.h1`
   letter-spacing: 0.5px;
 `;
 
-export { ContentHeader };
+const CenterHorizontallyAndVertically = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: ${sizing.spacingLarge};
+`;
+
+// const JustifyContentCenter = styled.div`
+//   display: flex;
+//   flex: 1;
+//   fle
+// `;
+
+export { ContentHeader, CenterHorizontallyAndVertically };
