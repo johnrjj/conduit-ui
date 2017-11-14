@@ -54,9 +54,9 @@ export class TradeTable extends React.Component<TradeTableProps, any> {
           ] as any
         }
         style={{
-          boxShadow: '0 2px 4px 0 rgba(36,48,86,0.20)',
-          width: '500px',
-          height: '400px', // This will force the table body to overflow and scroll, since there is not enough room
+          width: '100%',
+          // boxShadow: '0 2px 4px 0 rgba(36,48,86,0.20)',
+          // height: '400px',
         }}
         className="-striped -highlight"
       />

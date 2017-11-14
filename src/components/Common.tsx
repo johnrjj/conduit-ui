@@ -7,6 +7,7 @@ const ContentHeader = styled.h1`
   display: flex;
   flex-direction: row;
   flex: 1;
+  flex-shrink: 0;
   align-items: center;
   color: ${colors.darkBlue};
   height: 6rem;
