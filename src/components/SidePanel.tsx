@@ -29,7 +29,9 @@ const SidePanel = styled.div`
 const SidePanelHeader = styled.div`
   display: flex;
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   align-items: center;
   font-size: 1.5rem;
   padding-left: 1rem;

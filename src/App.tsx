@@ -5,7 +5,7 @@ import { BigNumber } from 'bignumber.js';
 import { ZeroEx, SignedOrder, Token } from '0x.js';
 import { RBTree } from 'bintrees';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
-import { Home } from './pages/Home';
+import { TokenSelect } from './pages/TokenSelect';
 import { TokenPairOrderbook } from './pages/TokenPairOrderbook';
 import { AppContainer, AppContent } from './components/MainLayout';
 import { TradeTable } from './components/TradeTable';
@@ -91,45 +91,39 @@ class App extends Component<AppProps | any, AppState> {
     return (
       <Router>
         <AppContainer>
-          <AppHeader title={'Conduit'} subtitle={'Open Source 0x Relayer'} logo={logo} />
-          {connectionStatus === 'disconnected' ? (
-            <ConnectionError />
-          ) : !hasLoadedTokens ? (
-            <CenterSpinner>
-              <Spinner />
-            </CenterSpinner>
-          ) : (
-            <AppContent>
-              <Switch>
-                <Route
-                  path="/orderbook/:tokenPair"
-                  render={props => {
-                    const ticker = props.match.params.tokenPair;
-                    const { baseToken, quoteToken } = this.getBaseAndQuoteTokenFromTicker(ticker);
-                    return (
-                      <TokenPairOrderbook
-                        baseToken={baseToken}
-                        quoteToken={quoteToken}
-                        wsEndpoint={wsEndpoint}
-                        {...props}
-                      />
-                    );
-                  }}
-                />
-                <Route
-                  exact
-                  path="/"
-                  render={props => <Home tokenPairs={tokenPairs} {...props} />}
-                />
-              </Switch>
-            </AppContent>
-          )}
-          <AppFooter>
-            <TimeSince
-              date={lastWebSocketUpdate}
-              formatter={timeSince => (timeSince ? `Last updated ${timeSince}` : 'Disconnected')}
+          <Route
+            path="/orderbook/:tokenPair"
+            render={props => {
+              const ticker = props.match.params.tokenPair;
+              const { baseToken, quoteToken } = this.getBaseAndQuoteTokenFromTicker(ticker);
+              return (
+                <AppContent>
+                  <AppHeader title={'Conduit'} subtitle={'Open Source 0x Relayer'} logo={logo} />
+                  <TokenPairOrderbook
+                    baseToken={baseToken}
+                    quoteToken={quoteToken}
+                    wsEndpoint={wsEndpoint}
+                    {...props}
+                  />
+                  <AppFooter>
+                    <TimeSince
+                      date={lastWebSocketUpdate}
+                      formatter={timeSince =>
+                        timeSince ? `Last updated ${timeSince}` : 'Disconnected'
+                      }
+                    />
+                  </AppFooter>
+                </AppContent>
+              );
+            }}
+          />
+          <Switch>
+            <Route
+              exact
+              path="/"
+              render={props => <TokenSelect tokenPairs={tokenPairs} {...props} />}
             />
-          </AppFooter>
+          </Switch>
         </AppContainer>
       </Router>
     );

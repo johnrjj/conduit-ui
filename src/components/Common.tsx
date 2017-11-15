@@ -28,10 +28,4 @@ const CenterHorizontallyAndVertically = styled.div`
   margin-bottom: ${sizing.spacingLarge};
 `;
 
-// const JustifyContentCenter = styled.div`
-//   display: flex;
-//   flex: 1;
-//   fle
-// `;
-
 export { ContentHeader, CenterHorizontallyAndVertically };

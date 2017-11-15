@@ -290,128 +290,155 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
         </MainPanel>
         <SidePanelContainer>
           <SidePanelHeader>Recent fills</SidePanelHeader>
-        <SidePanel>
-          <SidePanelContent>
-            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>
-            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>            <SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem><SidePanelListItem>
-              <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-              <SidePanelListItemSwapIcon />
-              <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-            </SidePanelListItem>
-          </SidePanelContent>
-        </SidePanel>
+          <SidePanel>
+            <SidePanelContent>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>{' '}
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>{' '}
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>{' '}
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>{' '}
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>{' '}
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>{' '}
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>{' '}
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>{' '}
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>{' '}
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>{' '}
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>{' '}
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>{' '}
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>{' '}
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+              <SidePanelListItem>
+                <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                <SidePanelListItemSwapIcon />
+                <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+              </SidePanelListItem>
+            </SidePanelContent>
+          </SidePanel>
         </SidePanelContainer>
       </OrderbookContainer>
     );
