@@ -88,6 +88,7 @@ class App extends Component<AppProps | any, AppState> {
     const { wsEndpoint } = this.props;
     const { lastWebSocketUpdate, connectionStatus, tokenPairs, tokens } = this.state;
     const hasLoadedTokens: boolean = tokenPairs.length > 0 && tokens.length > 0;
+    // TODO, if you go directly to the orderbook page it crashes cuz it doesnt wait on hasLoadedTokens
     return (
       <Router>
         <AppContainer>

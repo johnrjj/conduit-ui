@@ -1121,12 +1121,12 @@ caniuse-api@^1.5.2:
     lodash.uniq "^4.5.0"
 
 caniuse-db@^1.0.30000529, caniuse-db@^1.0.30000634, caniuse-db@^1.0.30000639:
-  version "1.0.30000760"
-  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000760.tgz#3ea29473eb78a6ccb09f2eb73ac9e1debfec528d"
+  version "1.0.30000764"
+  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000764.tgz#d73ab11ae62f6a9e2f69867d6d9c23ae3f2e5d8d"
 
 caniuse-lite@^1.0.30000697, caniuse-lite@^1.0.30000760:
-  version "1.0.30000760"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000760.tgz#ec720395742f1c7ec8947fd6dd2604e77a8f98ff"
+  version "1.0.30000764"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000764.tgz#97ea7472f9d3e691eede34f21983cfc219ac7842"
 
 capture-stack-trace@^1.0.0:
   version "1.0.0"
@@ -5061,9 +5061,9 @@ react-router@^4.2.0:
     prop-types "^15.5.4"
     warning "^3.0.0"
 
-react-scripts-ts@2.7.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/react-scripts-ts/-/react-scripts-ts-2.7.0.tgz#2417018f50e5343b5860b65c6a49049d1756c8c7"
+react-scripts-ts@^2.8.0:
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/react-scripts-ts/-/react-scripts-ts-2.8.0.tgz#6ef17a490725fd34ca3ba8829354581a97b310e8"
   dependencies:
     autoprefixer "7.1.2"
     case-sensitive-paths-webpack-plugin "2.1.1"
@@ -5084,11 +5084,11 @@ react-scripts-ts@2.7.0:
     style-loader "0.18.2"
     sw-precache-webpack-plugin "0.11.4"
     ts-jest "^20.0.7"
-    ts-loader "^2.2.1"
-    tslint "^5.2.0"
+    ts-loader "^2.3.7"
+    tslint "^5.7.0"
     tslint-loader "^3.5.3"
-    tslint-react "^3.0.0"
-    typescript "~2.4.0"
+    tslint-react "^3.2.0"
+    typescript "~2.5.3"
     url-loader "0.5.9"
     webpack "3.5.1"
     webpack-dev-server "2.7.1"
@@ -6143,7 +6143,7 @@ ts-jest@^20.0.7:
     source-map-support "^0.4.4"
     yargs "^8.0.1"
 
-ts-loader@^2.2.1:
+ts-loader@^2.3.7:
   version "2.3.7"
   resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-2.3.7.tgz#a9028ced473bee12f28a75f9c5b139979d33f2fc"
   dependencies:
@@ -6166,13 +6166,13 @@ tslint-loader@^3.5.3:
     rimraf "^2.4.4"
     semver "^5.3.0"
 
-tslint-react@^3.0.0:
+tslint-react@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/tslint-react/-/tslint-react-3.2.0.tgz#851fb505201c63d0343c51726e6364f7e9ad2e99"
   dependencies:
     tsutils "^2.8.0"
 
-tslint@^5.2.0:
+tslint@^5.7.0:
   version "5.8.0"
   resolved "https://registry.yarnpkg.com/tslint/-/tslint-5.8.0.tgz#1f49ad5b2e77c76c3af4ddcae552ae4e3612eb13"
   dependencies:
@@ -6221,9 +6221,9 @@ type-is@~1.6.15:
     media-typer "0.3.0"
     mime-types "~2.1.15"
 
-typescript@~2.4.0:
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.4.2.tgz#f8395f85d459276067c988aa41837a8f82870844"
+typescript@~2.5.3:
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.5.3.tgz#df3dcdc38f3beb800d4bc322646b04a3f6ca7f0d"
 
 ua-parser-js@^0.7.9:
   version "0.7.17"

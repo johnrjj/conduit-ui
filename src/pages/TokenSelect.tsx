@@ -18,6 +18,7 @@ const FullScreen = styled.div`
 
 const Logo = styled.img`
   height: 4rem;
+  min-height: 4rem;
   width: 4rem;
   margin: 1rem auto 0 auto;
 `;
@@ -57,10 +58,10 @@ const ActionText = styled.h2`
 const TokenPairGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, 17rem);
-  grid-gap: 1rem;
+  grid-gap: 0.5rem;
   justify-items: center;
   justify-content: space-evenly;
-  margin: 0 12rem 2rem;
+  margin: 0 8rem 2rem;
 `;
 
 const TokenPairCard = styled.div`
@@ -68,13 +69,13 @@ const TokenPairCard = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   height: 8rem;
   width: 16rem;
   background: #fff;
   border-radius: 4px;
   overflow: hidden;
   padding: 1rem 0;
+  margin-bottom: 0.5rem;
   cursor: pointer;
   box-shadow: 0 7px 14px #2b2571, 0 3px 6px rgba(0, 0, 0, 0.5);
   :hover {
