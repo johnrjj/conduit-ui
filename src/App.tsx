@@ -7,12 +7,8 @@ import { RBTree } from 'bintrees';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
 import { TokenSelect } from './pages/TokenSelect';
 import { TokenPairOrderbook } from './pages/TokenPairOrderbook';
-import { AppContainer, AppContent } from './components/MainLayout';
-import { TradeTable } from './components/TradeTable';
-import { AppHeader } from './components/Header';
+import { AppContainer } from './components/MainLayout';
 import { ConnectionError } from './components/ConnectionError';
-import { TimeSince } from './components/TimeSince';
-import { AppFooter } from './components/Footer';
 import { Spinner } from './components/Spinner';
 import { CenterHorizontallyAndVertically } from './components/Common';
 import { TokenPair } from './types';
@@ -88,6 +84,8 @@ class App extends Component<AppProps | any, AppState> {
     const { wsEndpoint } = this.props;
     const { lastWebSocketUpdate, connectionStatus, tokenPairs, tokens } = this.state;
     const hasLoadedTokens: boolean = tokenPairs.length > 0 && tokens.length > 0;
+    
+    if (!hasLoadedTokens) return (<Spinner/>);
     // TODO, if you go directly to the orderbook page it crashes cuz it doesnt wait on hasLoadedTokens
     return (
       <Router>
@@ -98,23 +96,12 @@ class App extends Component<AppProps | any, AppState> {
               const ticker = props.match.params.tokenPair;
               const { baseToken, quoteToken } = this.getBaseAndQuoteTokenFromTicker(ticker);
               return (
-                <AppContent>
-                  <AppHeader title={'Conduit'} subtitle={'Open Source 0x Relayer'} logo={logo} />
-                  <TokenPairOrderbook
-                    baseToken={baseToken}
-                    quoteToken={quoteToken}
-                    wsEndpoint={wsEndpoint}
-                    {...props}
-                  />
-                  <AppFooter>
-                    <TimeSince
-                      date={lastWebSocketUpdate}
-                      formatter={timeSince =>
-                        timeSince ? `Last updated ${timeSince}` : 'Disconnected'
-                      }
-                    />
-                  </AppFooter>
-                </AppContent>
+                <TokenPairOrderbook
+                  baseToken={baseToken}
+                  quoteToken={quoteToken}
+                  wsEndpoint={wsEndpoint}
+                  {...props}
+                />
               );
             }}
           />
@@ -125,8 +112,8 @@ class App extends Component<AppProps | any, AppState> {
               render={props => <TokenSelect tokenPairs={tokenPairs} {...props} />}
             />
           </Switch>
-        </AppContainer>
-      </Router>
+      </AppContainer>
+        </Router>
     );
   }
 }

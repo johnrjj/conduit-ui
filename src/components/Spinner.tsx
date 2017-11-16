@@ -1,13 +1,10 @@
 import * as React from 'react';
-import styled, { keyframes, ThemedStyledFunction, StyledFunction } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+import { withProps } from '../util/helpers';
 
 interface SpinnerBarProps {
   transformRotationDegrees: number | string;
   animationDelaySeconds: number | string;
-}
-
-function withProps<U>() {
-  return <P, T, O>(fn: ThemedStyledFunction<P, T, O>): ThemedStyledFunction<P & U, T, O & U> => fn;
 }
 
 const ReactSpinnerSpinAnimation = keyframes`

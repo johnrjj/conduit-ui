@@ -58,6 +58,12 @@ export class ZeroExFeed extends Component<ZeroExFeedProps> {
     snapshot = true,
     limit = 100
   ) => {
+
+    if (this.ws.readyState === this.ws.OPEN) {
+      this.ws && this.ws.close();
+      this.reconnect();
+    }
+
     this.send(
       JSON.stringify({
         channel: 'orderbook',
