@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { TokenPair } from '../types';
+import { FullTokenPairData } from '../types';
 // import colors from '../util/colors';
 // import sizing from '../util/sizing';
 const logo = require('../assets/icons/conduit-white.svg');
@@ -103,43 +103,42 @@ const TokenNameTicker = styled.p`
   font-size: 1rem;
 `;
 
-const destructureTokenPair = (tokenPair: TokenPair) => {
-  const [baseTokenSymbol, quoteTokenSymbol] = Object.keys(tokenPair);
-  const values = Object.keys(tokenPair).map(k => tokenPair[k]);
-  const [baseTokenData, quoteTokenData] = values;
-  const baseToken = {
-    symbol: baseTokenSymbol,
-    ...baseTokenData,
-  };
-  const quoteToken = {
-    symbol: quoteTokenSymbol,
-    ...quoteTokenData,
-  };
-  return {
-    baseToken,
-    quoteToken,
-  };
-};
+// const destructureTokenPair = (tokenPair: TokenPairFromApi) => {
+//   const [baseTokenSymbol, quoteTokenSymbol] = Object.keys(tokenPair);
+//   const values = Object.keys(tokenPair).map(k => tokenPair[k]);
+//   const [baseTokenData, quoteTokenData] = values;
+//   const baseToken = {
+//     symbol: baseTokenSymbol,
+//     ...baseTokenData,
+//   };
+//   const quoteToken = {
+//     symbol: quoteTokenSymbol,
+//     ...quoteTokenData,
+//   };
+//   return {
+//     baseToken,
+//     quoteToken,
+//   };
+// };
 
-const getTokenPairTicker = (tokenPair: TokenPair) => {
-  const [baseTokenSymbol, quoteTokenSymbol] = Object.keys(tokenPair);
-  return `${baseTokenSymbol}/${quoteTokenSymbol}`;
-};
+// const getTokenPairTicker = (tokenPair: TokenPairFromApi) => {
+//   const [baseTokenSymbol, quoteTokenSymbol] = Object.keys(tokenPair);
+//   return `${baseTokenSymbol}/${quoteTokenSymbol}`;
+// };
 
-const TokenPairSelect = ({ tokenPair }: { tokenPair: TokenPair }) => {
-  const { baseToken, quoteToken } = destructureTokenPair(tokenPair);
-  const ticker = getTokenPairTicker(tokenPair);
+const TokenPairSelect = ({tokenPair} : { tokenPair: FullTokenPairData}) => {
+  const { baseToken, quoteToken, nameTicker, symbolTicker } = tokenPair;
   return (
     <Link to={`orderbook/${baseToken.symbol}-${quoteToken.symbol}`}>
       <TokenPairCard>
-        <TokenSymbolTicker>{ticker}</TokenSymbolTicker>
-        <TokenNameTicker>{ticker}</TokenNameTicker>
+        <TokenSymbolTicker>{symbolTicker}</TokenSymbolTicker>
+        <TokenNameTicker>{nameTicker}</TokenNameTicker>
       </TokenPairCard>
     </Link>
   );
 };
 
-const TokenSelect = ({ tokenPairs }: { tokenPairs: Array<TokenPair> }) => (
+const TokenSelect = ({ tokenPairs }: { tokenPairs: Array<FullTokenPairData> }) => (
   <FullScreen>
     <ShrinkingTopSpacer />
     <Logo src={logo} />
@@ -148,7 +147,7 @@ const TokenSelect = ({ tokenPairs }: { tokenPairs: Array<TokenPair> }) => (
     <ActionText>Select a token pair</ActionText>
     <TokenPairGrid>
       {tokenPairs.map(tokenPair => (
-        <TokenPairSelect tokenPair={tokenPair} key={getTokenPairTicker(tokenPair)} />
+        <TokenPairSelect tokenPair={tokenPair} key={tokenPair.symbolTicker} />
       ))}
     </TokenPairGrid>
   </FullScreen>

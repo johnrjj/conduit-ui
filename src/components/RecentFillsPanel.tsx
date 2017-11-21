@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import colors from '../util/colors';
 import sizing from '../util/sizing';
 
-const sidePanelHeaderHeight = '4rem';
+const SIDE_PANEL_HEADER_HEIGHT = '4rem';
 
 const SidePanelContainer = styled.aside`
   position: relative;
@@ -21,7 +21,7 @@ const SidePanelContainer = styled.aside`
 
 const SidePanel = styled.div`
   position: absolute;
-  top: ${sidePanelHeaderHeight};
+  top: ${SIDE_PANEL_HEADER_HEIGHT};
   bottom: 0;
   left: 0;
   right: 0;
@@ -36,10 +36,10 @@ const SidePanelHeader = styled.div`
   right: 0;
   align-items: center;
   padding-left: 2rem;
-  height: ${sidePanelHeaderHeight};
+  height: ${SIDE_PANEL_HEADER_HEIGHT};
   align-items: center;
-  flex-basis: ${sidePanelHeaderHeight};
-  max-height: ${sidePanelHeaderHeight};
+  flex-basis: ${SIDE_PANEL_HEADER_HEIGHT};
+  max-height: ${SIDE_PANEL_HEADER_HEIGHT};
   font-size: 24px;
   color: #2d2f41;
   letter-spacing: 0;

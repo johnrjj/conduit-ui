@@ -40,8 +40,8 @@ const LeftNavHeaderTitle = styled.h1`
 const LeftNavSectionContainer = styled.div``;
 
 const LeftNavSectionTitle = styled.div`
-  font-size: 18px;
-  color: #79759b;
+  font-size: 1rem;
+  color: #9795bb;
   letter-spacing: 0.5px;
   font-weight: 700;
   text-transform: uppercase;

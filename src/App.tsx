@@ -6,7 +6,8 @@ import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-d
 import { TokenSelect } from './pages/TokenSelect';
 import { TokenPairOrderbook } from './pages/TokenPairOrderbook';
 import { Spinner } from './components/Spinner';
-import { TokenPair } from './types';
+import { enhanceTokenPairData } from './util/token'
+import { TokenPairFromApi } from './types';
 BigNumber.config({
   EXPONENTIAL_AT: 1000,
 });
@@ -19,7 +20,7 @@ export interface AppState {
   connectionStatus: 'connected' | 'disconnected' | 'loading';
   lastWebSocketUpdate?: Date;
   tokens: Array<Token>;
-  tokenPairs: Array<TokenPair>;
+  tokenPairs: Array<TokenPairFromApi>;
 }
 
 class App extends Component<AppProps | any, AppState> {
@@ -48,7 +49,7 @@ class App extends Component<AppProps | any, AppState> {
     return json;
   };
 
-  private fetchTokenPairs = async (): Promise<Array<TokenPair>> => {
+  private fetchTokenPairs = async (): Promise<Array<TokenPairFromApi>> => {
     const res = await fetch(`${this.props.restEndpoint}/token_pairs`);
     const json = res.json();
     return json;
@@ -87,6 +88,13 @@ class App extends Component<AppProps | any, AppState> {
     const hasLoadedTokens: boolean = tokenPairs.length > 0 && tokens.length > 0;
 
     if (!hasLoadedTokens) return <Spinner />;
+
+
+
+
+
+    const tokenPairsFullMetadata = tokenPairs.map(tokenPair => enhanceTokenPairData(tokenPair, tokens));
+    console.log(tokenPairsFullMetadata);
     // TODO, if you go directly to the orderbook page it crashes cuz it doesnt wait on hasLoadedTokens
     return (
       <Router>
@@ -104,6 +112,7 @@ class App extends Component<AppProps | any, AppState> {
                   baseToken={baseToken}
                   quoteToken={quoteToken}
                   wsEndpoint={wsEndpoint}
+                  availableTokenPairs={tokenPairsFullMetadata}
                   {...props}
                 />
               );
@@ -112,13 +121,15 @@ class App extends Component<AppProps | any, AppState> {
           <Route
             exact
             path="/"
-            render={props => <TokenSelect tokenPairs={tokenPairs} {...props} />}
+            render={props => <TokenSelect tokenPairs={tokenPairsFullMetadata} {...props} />}
           />
         </Switch>
       </Router>
     );
   }
 }
+
+
 
 // const CenterSpinner = styled.div`
 //   display: flex;

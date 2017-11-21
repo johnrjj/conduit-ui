@@ -29,9 +29,52 @@ import {
 } from '../components/RecentFillsPanel';
 import sizing from '../util/sizing';
 import colors from '../util/colors';
+import { FullTokenPairData } from '../types';
 const logo = require('../assets/icons/conduit-white.svg');
 
-const ContentHeader = styled.h1`
+const AppContent = styled.div`
+  display: flex;
+  flex: 1;
+  height: 100%;
+`;
+
+const HeaderBar = styled.div`
+  height: 4rem;
+  padding-left: 4rem;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  @media (max-width: ${sizing.mediumMediaQuery}) {
+    padding-left: 2rem;
+  }
+`;
+
+const HeaderTitle = styled.h1`
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #33354a;
+  letter-spacing: 0;
+`;
+
+
+const AllContentBelowHeader = styled.div`
+  display: flex;
+  flex: 1;
+`;
+
+const MainPanel = styled.section`
+  display: flex;
+  flex: 1;
+  flex-basis: 40rem;
+  flex-direction: column;
+  padding: 0 4rem;
+  background-image: linear-gradient(-180deg, #f7f7f8 0%, #ffffff 100%);
+  @media (max-width: ${sizing.mediumMediaQuery}) {
+    padding: 0 2rem;
+  }
+`;
+
+const MainPanelHeader = styled.h1`
   display: flex;
   flex-direction: row;
   flex: 1;
@@ -77,58 +120,18 @@ const BidTableContainer = styled.div`
   box-shadow: 0 2px 4px 0 rgba(36, 48, 86, 0.2);
 `;
 
-const OrderbookContainer = styled.div`
+const AsksAndBidsTablesContainer = styled.div`
   display: flex;
   height: 100%;
   flex: 1;
   flex-direction: column;
-`;
-
-const HeaderBar = styled.div`
-  height: 4rem;
-  padding-left: 4rem;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  @media (max-width: ${sizing.mediumMediaQuery}) {
-    padding-left: 2rem;
-  }
-`;
-
-const HeaderTitle = styled.h1`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #33354a;
-  letter-spacing: 0;
-`;
-
-const AppContent = styled.div`
-  display: flex;
-  flex: 1;
-  height: 100%;
-`;
-
-const AllContentBelowHeader = styled.div`
-  display: flex;
-  flex: 1;
-`;
-
-const MainPanel = styled.section`
-  display: flex;
-  flex: 1;
-  flex-basis: 40rem;
-  flex-direction: column;
-  padding: 0 4rem;
-  background-image: linear-gradient(-180deg, #f7f7f8 0%, #ffffff 100%);
-  @media (max-width: ${sizing.mediumMediaQuery}) {
-    padding: 0 2rem;
-  }
 `;
 
 export interface OrderbookProps {
   wsEndpoint: string;
   baseToken: Token;
   quoteToken: Token;
+  availableTokenPairs: Array<FullTokenPairData>
 }
 
 export interface OrderbookState {
@@ -142,6 +145,7 @@ export interface OrderbookState {
 export interface OrderDetails {
   price: BigNumber;
 }
+
 
 class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   feed: ZeroExFeed | null;
@@ -381,13 +385,13 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
             />
           </LeftNavSectionContainer>
         </LeftNavContainer>
-        <OrderbookContainer>
+        <AsksAndBidsTablesContainer>
           <HeaderBar>
             <HeaderTitle>Maker / Ethereum</HeaderTitle>
           </HeaderBar>
           <AllContentBelowHeader>
             <MainPanel>
-              <ContentHeader>{midMarketPrice}</ContentHeader>
+              <MainPanelHeader>{midMarketPrice}</MainPanelHeader>
               <BidsAndAsksTablesContainer>
                 <AskTableContainer>
                   <TradeTable
@@ -439,7 +443,7 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
               </SidePanel>
             </SidePanelContainer>
           </AllContentBelowHeader>
-        </OrderbookContainer>
+        </AsksAndBidsTablesContainer>
       </AppContent>
     );
   }
