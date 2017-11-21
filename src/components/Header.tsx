@@ -46,10 +46,10 @@ const HeaderDescriptionContainer = styled.div`
   flex: 1;
 `;
 
-const FilledButton = styled.button`
-  background-image: linear-gradient(-90deg, #83dba8 0%, rgba(34, 178, 95, 0.87) 96%);
-  box-shadow: 0 2px 4px 0 rgba(24, 93, 51, 0.9);
-`;
+// const FilledButton = styled.button`
+//   background-image: linear-gradient(-90deg, #83dba8 0%, rgba(34, 178, 95, 0.87) 96%);
+//   box-shadow: 0 2px 4px 0 rgba(24, 93, 51, 0.9);
+// `;
 
 const AppHeader = ({ logo, title, subtitle }: any) => (
   <HeaderContainer>

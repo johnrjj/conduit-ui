@@ -4,23 +4,12 @@ import styled from 'styled-components';
 import { BigNumber } from 'bignumber.js';
 import { ZeroEx, SignedOrder, Token } from '0x.js';
 import { RBTree } from 'bintrees';
-import { subHours, subMinutes, subDays } from 'date-fns';
-import { BrowserRouter as Router, Route, Link, NavLink, Switch, NavLinkProps } from 'react-router-dom';
-import { MainPanel } from '../components/MainLayout';
+import { NavLink } from 'react-router-dom';
 import { TradeTable } from '../components/TradeTable';
-import { ContentHeader } from '../components/Common';
 import { ZeroExFeed, OrderbookSnapshot } from '../components/ZeroExFeed';
-import { AppContainer, AppContent } from '../components/MainLayout';
-import { AppHeader } from '../components/Header';
-import { AppFooter } from '../components/Footer';
-import { TimeSince } from '../components/TimeSince';
-import { Spinner} from '../components/Spinner';
-
-import { withProps } from '../util/helpers';
-
-
+import { Spinner } from '../components/Spinner';
 const logo = require('../assets/icons/conduit-white.svg');
-const exchange = require('../assets/icons/exchange-black.svg');
+// const exchange = require('../assets/icons/exchange-black.svg');
 
 import {
   SidePanelContainer,
@@ -33,100 +22,125 @@ import {
   SidePanelListItemSwapIcon,
 } from '../components/SidePanel';
 import sizing from '../util/sizing';
-import { TokenPair } from '../types';
-
+import colors from '../util/colors';
 
 const LeftNavContainer = styled.div`
-  background-image: linear-gradient(-180deg, #25206B 0%, #5E4DA3 99%);
-  width: 16rem;
   display: flex;
   flex-direction: column;
+  flex-basis: 16rem;
+  max-width: 16rem;
+  min-width: 12rem;
+  background-image: linear-gradient(-180deg, #25206b 0%, #5e4da3 50%);
 `;
 
 const LeftNavHeader = styled.div`
-  height: 72px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  height: 4rem;
+  min-height: 4rem;
+  margin: 0rem 2rem 3rem 20px;
+  // border-bottom: 1px solid #3D377F;
+`;
+
+const LeftNavHeaderLogo = styled.img`
+  height: 2rem;
+  min-height: 2rem;
+  width: 2rem;
+  margin-right: 0.5rem;
+`;
+
+const LeftNavHeaderTitle = styled.h1`
+  font-family: Futura;
+  font-weight: 500;
+  font-size: 1.5rem;
+  color: #ffffff;
+  letter-spacing: 1px;
+`;
+
+const LeftNavSectionContainer = styled.div``;
+
+const LeftNavSectionTitle = styled.div`
+  font-size: 18px;
+  color: #79759b;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding-left: 20px;
   margin-bottom: 1rem;
 `;
 
-const LeftNavSectionContainer = styled.div`
-
-`;
-
-interface ListItemProps {
-  active?: boolean;
-}
-
-
-const LeftNavSectionTitle = styled.div`
-font-size: 18px;
-color: #79759B;
-letter-spacing: 0.5px;
-font-weight: 700;
-text-transform: uppercase;
-padding-left: 20px;
-margin-bottom: 1rem;
-`;
-
-
 const activeClassName = 'nav-item-active';
-
 const LeftNavListItemContainer = styled(NavLink).attrs({
-  activeClassName
+  activeClassName,
 })`
   height: 72px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding-left: 20px;
-  opacity: 0.8;
+  opacity: 0.7;
+  transition: all 0ms;
   &.${activeClassName} {
-    background-image: linear-gradient(-90deg, #2D2672 0%, #282268 100%);
+    background-image: linear-gradient(90deg, #2d2672 0%, #282268 100%);
     border-left: 4px solid #66609c;
     padding-left: 16px;
     opacity: 1;
+    transition: all 300ms;
   }
   :hover {
-    opacity: 1;
+    opacity: 0.85;
   }
-  
 `;
 
-const LeftNavListItem = ({ title, subtitle, to }: { title?: string, subtitle?: string, to: string  }) => (
-    <LeftNavListItemContainer to={to} activeClassName={activeClassName}>
-      <LeftNavListItemTitle>{title}</LeftNavListItemTitle>
-      <LeftNavListItemSubtitle>{subtitle}</LeftNavListItemSubtitle>
-    </LeftNavListItemContainer>
-);
-
 const LeftNavListItemTitle = styled.div`
-  font-family: Futura-Medium;
   font-size: 18px;
-  color: #DBDAE9;
+  font-weight: 500;
+  color: #ffffff;
   margin-bottom: 8px;
   letter-spacing: 0.5px;
+  text-overflow: ellipse;
 `;
 
 const LeftNavListItemSubtitle = styled.div`
-  font-family: Futura-Medium;
   font-size: 14px;
-  color: #ADA8CD;
-  letter-spacing: 0;
+  font-weight: 500;
+  color: #ada8cd;
+  letter-spacing: 0.5px;
+  text-overflow: ellipse;
 `;
 
-// /* Rectangle 16: */
-// background-image: linear-gradient(-90deg, #2D2672 0%, #282268 100%);
-// /* Rectangle: */
-// background: #66609C;
-// /* MKR/ETH: */
-// font-family: Futura-Medium;
-// font-size: 18px;
-// color: #DBDAE9;
-// letter-spacing: 0;
-// /* Maker / Ethereum: */
-// font-family: Futura-Medium;
-// font-size: 14px;
-// color: #ADA8CD;
-// letter-spacing: 0;
+const LeftNavListItem = ({
+  title,
+  subtitle,
+  to,
+}: {
+  title?: string;
+  subtitle?: string;
+  to: string;
+}) => (
+  <LeftNavListItemContainer to={to} activeClassName={activeClassName}>
+    <LeftNavListItemTitle>{title}</LeftNavListItemTitle>
+    <LeftNavListItemSubtitle>{subtitle}</LeftNavListItemSubtitle>
+  </LeftNavListItemContainer>
+);
+
+const ContentHeader = styled.h1`
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  flex-shrink: 0;
+  flex-basis: 6rem;
+  height: 6rem;
+  max-height: 6rem;
+  align-items: center;
+  padding-top: 0;
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  color: ${colors.darkBlue};
+`;
 
 const BidsAndAsksTablesContainer = styled.div`
   display: flex;
@@ -137,26 +151,72 @@ const BidsAndAsksTablesContainer = styled.div`
   }
 `;
 
-const IndividualTableContainer = styled.div`
+const AskTableContainer = styled.div`
   position: relative;
   display: flex;
   max-height: 480px;
   flex: 1;
   margin-bottom: 2rem;
-  overflow: scroll;
   box-shadow: 0 2px 4px 0 rgba(36, 48, 86, 0.2);
   @media (min-width: ${sizing.mediumMediaQuery}) {
     margin-right: ${sizing.spacingMedium};
   }
 `;
 
+const BidTableContainer = styled.div`
+  position: relative;
+  display: flex;
+  max-height: 480px;
+  flex: 1;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px 0 rgba(36, 48, 86, 0.2);
+`;
+
 const OrderbookContainer = styled.div`
   display: flex;
   height: 100%;
   flex: 1;
-  @media (max-width: ${sizing.smallMediaQuery}) {
-    flex-direction: column;
-    overflow: scroll;
+  flex-direction: column;
+`;
+
+const HeaderBar = styled.div`
+  height: 4rem;
+  padding-left: 4rem;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  @media (max-width: ${sizing.mediumMediaQuery}) {
+    padding-left: 2rem;
+  }
+`;
+
+const HeaderTitle = styled.h1`
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #33354a;
+  letter-spacing: 0;
+`;
+
+const AppContent = styled.div`
+  display: flex;
+  flex: 1;
+  height: 100%;
+`;
+
+const AllContentBelowHeader = styled.div`
+  display: flex;
+  flex: 1;
+`;
+
+const MainPanel = styled.section`
+  display: flex;
+  flex: 1;
+  flex-basis: 40rem;
+  flex-direction: column;
+  padding: 0 4rem;
+  background-image: linear-gradient(-180deg, #f7f7f8 0%, #ffffff 100%);
+  @media (max-width: ${sizing.mediumMediaQuery}) {
+    padding: 0 2rem;
   }
 `;
 
@@ -197,7 +257,10 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   }
 
   componentWillReceiveProps(nextProps: OrderbookProps) {
-    if (nextProps.baseToken.address !== this.props.baseToken.address || nextProps.quoteToken.address !== this.props.quoteToken.address) {
+    if (
+      nextProps.baseToken.address !== this.props.baseToken.address ||
+      nextProps.quoteToken.address !== this.props.quoteToken.address
+    ) {
       console.log('new pair to look at, resetting state');
       this.setState({
         bids: new RBTree<SignedOrder>(this.sortOrdersAsc),
@@ -206,7 +269,8 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
         recentFills: [],
         loading: true,
       });
-      this.feed && this.feed.subscribeToOrderbook(nextProps.baseToken.address, nextProps.quoteToken.address);
+      this.feed &&
+        this.feed.subscribeToOrderbook(nextProps.baseToken.address, nextProps.quoteToken.address);
     }
   }
 
@@ -222,7 +286,7 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
 
   handleOrderbookSnapshot = (snapshot: OrderbookSnapshot) => {
     const { bids, asks } = snapshot;
-    const { baseToken, quoteToken } = this.props;
+    // const { baseToken, quoteToken } = this.props;
     bids.forEach(this.addBidToOrderbook);
     asks.forEach(this.addAskToOrderbook);
     if (this.state.loading) {
@@ -325,7 +389,7 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
     }
     const priceA = this.getPriceForSignedOrder(a);
     const priceB = this.getPriceForSignedOrder(b);
-    const priceDif = priceB.sub(priceB);
+    const priceDif = priceB.sub(priceA);
     if (!priceDif.isZero()) {
       return priceDif.toNumber();
     }
@@ -364,223 +428,112 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   render() {
     console.log(this.state);
 
-
-    
     const { wsEndpoint, baseToken, quoteToken } = this.props;
     const { loading, asks, bids } = this.state;
 
-    if (!quoteToken || !baseToken) 
-    return (
-      <Spinner/>
-    );
+    if (!quoteToken || !baseToken) return <Spinner />;
 
     const asksInOrder = this.RBTreeToArray(asks);
     const bidsInOrder = this.RBTreeToArray(bids);
     const midMarketPrice = this.getMidMarketPrice(bids, asks).toFixed(5);
 
-
-
     return (
       <AppContent>
+        <ZeroExFeed
+          ref={ref => (this.feed = ref)}
+          url={wsEndpoint}
+          onMessage={this.handleSocketMessage}
+          onOrderbookSnapshot={this.handleOrderbookSnapshot}
+          onOrderbookUpdate={this.handleOrderbookUpdate}
+          onOrderbookFill={this.handleOrderbookFill}
+          onClose={() => {}}
+        />
         <LeftNavContainer>
           <LeftNavHeader>
+            <NavLink to={'/'}>
+              <LeftNavHeaderLogo src={logo} />
+            </NavLink>
+            <NavLink to={'/'}>
+              <LeftNavHeaderTitle>Conduit</LeftNavHeaderTitle>
+            </NavLink>
           </LeftNavHeader>
           <LeftNavSectionContainer>
             <LeftNavSectionTitle>Token Pairs</LeftNavSectionTitle>
-            <LeftNavListItem to={'/orderbook/MKR-WETH'} title={'MKR/ETH'} subtitle={'Maker/Ethereum'} />
-            <LeftNavListItem to={'/orderbook/ZRX-WETH'} title={'ZRX/ETH'} subtitle={'ZeroEx/Ethereum'} />
-            <LeftNavListItem to={'MKR-ETmeowH'} title={'MKR/ETH'} subtitle={'Maker/Ethereum'} />
-
+            <LeftNavListItem
+              to={'/orderbook/MKR-WETH'}
+              title={'MKR/ETH'}
+              subtitle={'Maker/Ethereum'}
+            />
+            <LeftNavListItem
+              to={'/orderbook/ZRX-WETH'}
+              title={'ZRX/ETH'}
+              subtitle={'ZeroEx/Ethereum'}
+            />
+            <LeftNavListItem
+              to={'/orderbook/DOESNOTEXIST'}
+              title={'NOPE/ETH'}
+              subtitle={'DNE/Ethereum'}
+            />
           </LeftNavSectionContainer>
         </LeftNavContainer>
         <OrderbookContainer>
-          <ZeroExFeed
-            ref={ref => (this.feed = ref)}
-            url={wsEndpoint}
-            onMessage={this.handleSocketMessage}
-            onOrderbookSnapshot={this.handleOrderbookSnapshot}
-            onOrderbookUpdate={this.handleOrderbookUpdate}
-            onOrderbookFill={this.handleOrderbookFill}
-            onClose={() => {}}
-          />
-          <MainPanel>
-            <ContentHeader>Open Orders</ContentHeader>
-            <ContentHeader>{midMarketPrice}</ContentHeader>
-            <BidsAndAsksTablesContainer>
-              <IndividualTableContainer>
-                <TradeTable
-                  headerTitle={'Asks'}
-                  baseTokenSymbol={baseToken.symbol}
-                  quoteTokenSymbol={quoteToken.symbol}
-                  data={asksInOrder}
-                  loading={loading}
-                  noOrdersText={'No asks found'}
-                />
-              </IndividualTableContainer>
-              <IndividualTableContainer>
-                <TradeTable
-                  headerTitle={'Bids'}
-                  baseTokenSymbol={baseToken.symbol}
-                  quoteTokenSymbol={quoteToken.symbol}
-                  data={bidsInOrder}
-                  loading={loading}
-                  noOrdersText={'No bids found'}
-                />
-              </IndividualTableContainer>
-            </BidsAndAsksTablesContainer>
-          </MainPanel>
-          <SidePanelContainer>
-            <SidePanelHeader>Recent fills</SidePanelHeader>
-            <SidePanel>
-              <SidePanelContent>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>{' '}
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>{' '}
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>{' '}
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>{' '}
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>{' '}
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>{' '}
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>{' '}
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>{' '}
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>{' '}
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>{' '}
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>{' '}
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>{' '}
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>{' '}
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-                <SidePanelListItem>
-                  <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                  <SidePanelListItemSwapIcon />
-                  <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                </SidePanelListItem>
-              </SidePanelContent>
-            </SidePanel>
-          </SidePanelContainer>
+          <HeaderBar>
+            <HeaderTitle>Maker / Ethereum</HeaderTitle>
+          </HeaderBar>
+          <AllContentBelowHeader>
+            <MainPanel>
+              <ContentHeader>{midMarketPrice}</ContentHeader>
+              <BidsAndAsksTablesContainer>
+                <AskTableContainer>
+                  <TradeTable
+                    headerTitle={'Asks'}
+                    baseTokenSymbol={baseToken.symbol}
+                    quoteTokenSymbol={quoteToken.symbol}
+                    data={asksInOrder}
+                    loading={loading}
+                    noOrdersText={'No asks found'}
+                  />
+                </AskTableContainer>
+                <BidTableContainer>
+                  <TradeTable
+                    headerTitle={'Bids'}
+                    baseTokenSymbol={baseToken.symbol}
+                    quoteTokenSymbol={quoteToken.symbol}
+                    data={bidsInOrder}
+                    loading={loading}
+                    noOrdersText={'No bids found'}
+                  />
+                </BidTableContainer>
+              </BidsAndAsksTablesContainer>
+            </MainPanel>
+            <SidePanelContainer>
+              <SidePanelHeader>Recent fills</SidePanelHeader>
+              <SidePanel>
+                <SidePanelContent>
+                  <SidePanelListItem>
+                    <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                    <SidePanelListItemSwapIcon />
+                    <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+                  </SidePanelListItem>
+                  <SidePanelListItem>
+                    <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                    <SidePanelListItemSwapIcon />
+                    <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+                  </SidePanelListItem>{' '}
+                  <SidePanelListItem>
+                    <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                    <SidePanelListItemSwapIcon />
+                    <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+                  </SidePanelListItem>{' '}
+                  <SidePanelListItem>
+                    <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
+                    <SidePanelListItemSwapIcon />
+                    <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
+                  </SidePanelListItem>{' '}
+                </SidePanelContent>
+              </SidePanel>
+            </SidePanelContainer>
+          </AllContentBelowHeader>
         </OrderbookContainer>
       </AppContent>
     );

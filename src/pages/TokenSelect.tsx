@@ -1,10 +1,9 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { ContentHeader } from '../components/Common';
 import { TokenPair } from '../types';
-import colors from '../util/colors';
-import sizing from '../util/sizing';
+// import colors from '../util/colors';
+// import sizing from '../util/sizing';
 const logo = require('../assets/icons/conduit-white.svg');
 
 const FullScreen = styled.div`
@@ -12,6 +11,7 @@ const FullScreen = styled.div`
   flex: 1;
   flex-direction: column;
   width: 100%;
+  min-height: 100%;
   overflow-y: scroll;
   background-image: linear-gradient(-180deg, #25206b 0%, #5e4da3 99%);
 `;
@@ -56,12 +56,16 @@ const ActionText = styled.h2`
 `;
 
 const TokenPairGrid = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   display: grid;
   grid-template-columns: repeat(auto-fit, 17rem);
   grid-gap: 0.5rem;
   justify-items: center;
   justify-content: space-evenly;
-  margin: 0 8rem 2rem;
+  padding: 0 2rem;
+  margin-bottom: 2rem;
 `;
 
 const TokenPairCard = styled.div`
@@ -101,7 +105,8 @@ const TokenNameTicker = styled.p`
 
 const destructureTokenPair = (tokenPair: TokenPair) => {
   const [baseTokenSymbol, quoteTokenSymbol] = Object.keys(tokenPair);
-  const [baseTokenData, quoteTokenData] = Object.values(tokenPair);
+  const values = Object.keys(tokenPair).map(k => tokenPair[k]);
+  const [baseTokenData, quoteTokenData] = values;
   const baseToken = {
     symbol: baseTokenSymbol,
     ...baseTokenData,

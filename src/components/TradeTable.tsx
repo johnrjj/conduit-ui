@@ -1,5 +1,4 @@
 import * as React from 'react';
-import styled from 'styled-components';
 import { SignedOrder } from '0x.js';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';

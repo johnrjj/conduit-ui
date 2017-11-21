@@ -1,19 +1,12 @@
 import * as React from 'react';
 import { Component } from 'react';
-import styled from 'styled-components';
 import { BigNumber } from 'bignumber.js';
-import { ZeroEx, SignedOrder, Token } from '0x.js';
-import { RBTree } from 'bintrees';
-import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
+import { Token } from '0x.js';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { TokenSelect } from './pages/TokenSelect';
 import { TokenPairOrderbook } from './pages/TokenPairOrderbook';
-import { AppContainer } from './components/MainLayout';
-import { ConnectionError } from './components/ConnectionError';
 import { Spinner } from './components/Spinner';
-import { CenterHorizontallyAndVertically } from './components/Common';
 import { TokenPair } from './types';
-const logo = require('./assets/icons/conduit-white.svg');
-const exchange = require('./assets/icons/exchange-black.svg');
 BigNumber.config({
   EXPONENTIAL_AT: 1000,
 });
@@ -72,29 +65,40 @@ class App extends Component<AppProps | any, AppState> {
   private getBaseAndQuoteTokenFromTicker = (ticker: string) => {
     const tickerParts = ticker.split('-');
     const [baseTokenSymbol, quoteTokenSymbol] = tickerParts;
-    const baseToken = this.getTokenFromSymbol(baseTokenSymbol);
-    const quoteToken = this.getTokenFromSymbol(quoteTokenSymbol);
-    return {
-      baseToken,
-      quoteToken,
-    };
+    try {
+      const baseToken = this.getTokenFromSymbol(baseTokenSymbol);
+      const quoteToken = this.getTokenFromSymbol(quoteTokenSymbol);
+      return {
+        baseToken,
+        quoteToken,
+      };
+    } catch (e) {
+      console.error(e);
+      return {
+        baseToken: null,
+        quoteToken: null,
+      };
+    }
   };
 
   render() {
     const { wsEndpoint } = this.props;
-    const { lastWebSocketUpdate, connectionStatus, tokenPairs, tokens } = this.state;
+    const { tokenPairs, tokens } = this.state;
     const hasLoadedTokens: boolean = tokenPairs.length > 0 && tokens.length > 0;
-    
-    if (!hasLoadedTokens) return (<Spinner/>);
+
+    if (!hasLoadedTokens) return <Spinner />;
     // TODO, if you go directly to the orderbook page it crashes cuz it doesnt wait on hasLoadedTokens
     return (
       <Router>
-        <AppContainer>
+        <Switch>
           <Route
             path="/orderbook/:tokenPair"
             render={props => {
               const ticker = props.match.params.tokenPair;
               const { baseToken, quoteToken } = this.getBaseAndQuoteTokenFromTicker(ticker);
+              if (!baseToken || !quoteToken) {
+                return <Redirect to={'/'} />;
+              }
               return (
                 <TokenPairOrderbook
                   baseToken={baseToken}
@@ -105,23 +109,21 @@ class App extends Component<AppProps | any, AppState> {
               );
             }}
           />
-          <Switch>
-            <Route
-              exact
-              path="/"
-              render={props => <TokenSelect tokenPairs={tokenPairs} {...props} />}
-            />
-          </Switch>
-      </AppContainer>
-        </Router>
+          <Route
+            exact
+            path="/"
+            render={props => <TokenSelect tokenPairs={tokenPairs} {...props} />}
+          />
+        </Switch>
+      </Router>
     );
   }
 }
 
-const CenterSpinner = styled.div`
-  display: flex;
-  align-items: center;
-  flex: 1;
-`;
+// const CenterSpinner = styled.div`
+//   display: flex;
+//   align-items: center;
+//   flex: 1;
+// `;
 
 export default App;

@@ -36,7 +36,6 @@ const SpinnerContainer = styled.div`
 const Spinner = props => {
   let bars: Array<any> = [];
   for (let i = 0; i < 12; i++) {
-    let barStyle = {};
     const animationDelaySeconds = (i - 12) / 10;
     const transformRotationDegrees = i * 30;
     bars.push(
