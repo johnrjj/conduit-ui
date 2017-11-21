@@ -1,0 +1,176 @@
+@font-face {
+	font-family: 'icomoon';
+	src:url('fonts/icomoon.eot');
+	src:url('fonts/icomoon.eot?#iefix') format('embedded-opentype'),
+		url('fonts/icomoon.woff') format('woff'),
+		url('fonts/icomoon.ttf') format('truetype'),
+		url('fonts/icomoon.svg#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+/* Windows Chrome ugly fix http://stackoverflow.com/questions/13674808/chrome-svg-font-rendering-breaks-layout/14345363#14345363 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+	@font-face {
+		font-family: 'icomoon';
+		src: url('fonts/icomoon.svg#icomoon') format('svg');
+	};
+}
+
+/* Use the following CSS code if you want to use data attributes for inserting your icons */
+[data-icon]:before {
+	font-family: 'icomoon';
+	content: attr(data-icon);
+	speak: none;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* Use the following CSS code if you want to have a class per icon */
+/*
+Instead of a list of all class selectors,
+you can use the generic selector below, but it's slower:
+[class*="icon-"] {
+*/
+.icon-home, .icon-office, .icon-newspaper, .icon-pencil, .icon-pencil-2, .icon-books, .icon-book, .icon-film, .icon-file, .icon-profile, .icon-tablet, .icon-mobile, .icon-mobile-2, .icon-screen, .icon-laptop, .icon-images, .icon-headphones, .icon-file-2, .icon-link, .icon-location, .icon-html5, .icon-linkedin, .icon-github, .icon-github-2, .icon-wordpress, .icon-tumblr, .icon-skype, .icon-facebook, .icon-twitter, .icon-facebook-2, .icon-google-plus, .icon-google-plus-2, .icon-github-3, .icon-wordpress-2, .icon-tumblr-2, .icon-apple, .icon-android, .icon-windows8, .icon-quill, .icon-qrcode, .icon-redo, .icon-undo, .icon-library {
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+}
+.icon-home:before {
+	content: "\e000";
+}
+.icon-office:before {
+	content: "\e002";
+}
+.icon-newspaper:before {
+	content: "\e003";
+}
+.icon-pencil:before {
+	content: "\e004";
+}
+.icon-pencil-2:before {
+	content: "\e005";
+}
+.icon-books:before {
+	content: "\e006";
+}
+.icon-book:before {
+	content: "\e007";
+}
+.icon-film:before {
+	content: "\e00a";
+}
+.icon-file:before {
+	content: "\e00b";
+}
+.icon-profile:before {
+	content: "\e00c";
+}
+.icon-tablet:before {
+	content: "\e00d";
+}
+.icon-mobile:before {
+	content: "\e00e";
+}
+.icon-mobile-2:before {
+	content: "\e00f";
+}
+.icon-screen:before {
+	content: "\e010";
+}
+.icon-laptop:before {
+	content: "\e011";
+}
+.icon-images:before {
+	content: "\e001";
+}
+.icon-headphones:before {
+	content: "\e008";
+}
+.icon-file-2:before {
+	content: "\e009";
+}
+.icon-link:before {
+	content: "\e013";
+}
+.icon-location:before {
+	content: "\e014";
+}
+.icon-html5:before {
+	content: "\e012";
+}
+.icon-linkedin:before {
+	content: "\e015";
+}
+.icon-github:before {
+	content: "\e016";
+}
+.icon-github-2:before {
+	content: "\e017";
+}
+.icon-wordpress:before {
+	content: "\e018";
+}
+.icon-tumblr:before {
+	content: "\e019";
+}
+.icon-skype:before {
+	content: "\e01b";
+}
+.icon-facebook:before {
+	content: "\e01c";
+}
+.icon-twitter:before {
+	content: "\e01d";
+}
+.icon-facebook-2:before {
+	content: "\e01a";
+}
+.icon-google-plus:before {
+	content: "\e01e";
+}
+.icon-google-plus-2:before {
+	content: "\e01f";
+}
+.icon-github-3:before {
+	content: "\e020";
+}
+.icon-wordpress-2:before {
+	content: "\e021";
+}
+.icon-tumblr-2:before {
+	content: "\e022";
+}
+.icon-apple:before {
+	content: "\e023";
+}
+.icon-android:before {
+	content: "\e024";
+}
+.icon-windows8:before {
+	content: "\e025";
+}
+.icon-quill:before {
+	content: "\e026";
+}
+.icon-qrcode:before {
+	content: "\e027";
+}
+.icon-redo:before {
+	content: "\e028";
+}
+.icon-undo:before {
+	content: "\e029";
+}
+.icon-library:before {
+	content: "\e02a";
+}

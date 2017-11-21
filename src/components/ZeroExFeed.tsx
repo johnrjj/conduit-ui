@@ -1,6 +1,5 @@
-import * as React from 'react';
 import { Component } from 'react';
-import { ZeroEx, SignedOrder } from '0x.js';
+import { SignedOrder } from '0x.js';
 
 export type OrderbookUpdate = SignedOrder;
 
@@ -58,6 +57,10 @@ export class ZeroExFeed extends Component<ZeroExFeedProps> {
     snapshot = true,
     limit = 100
   ) => {
+    if (this.ws.readyState === this.ws.OPEN) {
+      this.reconnect();
+    }
+
     this.send(
       JSON.stringify({
         channel: 'orderbook',
@@ -108,7 +111,7 @@ export class ZeroExFeed extends Component<ZeroExFeedProps> {
       case 'snapshot':
         const orderbookSnapshotEvent = orderbookEvent as RelayerSocketResponse<OrderbookSnapshot>;
         console.log('got a snapshot orderbook event', orderbookSnapshotEvent);
-        const orderbookSnapshot = orderbookSnapshotEvent.payload;
+        // const orderbookSnapshot = orderbookSnapshotEvent.payload;
         this.props.onOrderbookSnapshot &&
           this.props.onOrderbookSnapshot(orderbookSnapshotEvent.payload);
         return;
@@ -116,13 +119,13 @@ export class ZeroExFeed extends Component<ZeroExFeedProps> {
         console.log('2');
         const orderbookUpdateEvent = orderbookEvent as RelayerSocketResponse<OrderbookUpdate>;
         console.log('got a update orderbook event', orderbookEvent, orderbookUpdateEvent);
-        const updatedOrder = orderbookUpdateEvent.payload;
+        // const updatedOrder = orderbookUpdateEvent.payload;
         this.props.onOrderbookUpdate && this.props.onOrderbookUpdate(orderbookUpdateEvent);
         return;
       case 'fill':
         // remember this is nonstandard api spec
         console.log('got a fill orderbook event', orderbookEvent);
-        const orderbookFillEvent = orderbookEvent as RelayerSocketResponse<OrderbookFill>;
+        // const orderbookFillEvent = orderbookEvent as RelayerSocketResponse<OrderbookFill>;
         this.props.onOrderbookFill && this.props.onOrderbookFill(orderbookEvent);
         return;
       default:

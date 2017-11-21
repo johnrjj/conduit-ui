@@ -1,22 +1,12 @@
 import * as React from 'react';
 import { Component } from 'react';
-import styled from 'styled-components';
 import { BigNumber } from 'bignumber.js';
-import { ZeroEx, SignedOrder, Token } from '0x.js';
-import { RBTree } from 'bintrees';
-import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
-import { AppContainer, AppContent } from './components/MainLayout';
-import { TradeTable } from './components/TradeTable';
-import { AppHeader } from './components/Header';
-import { Home } from './components/Home';
-import { LoadingScreen } from './components/Loading';
-import { ConnectionError } from './components/ConnectionError';
-import { Orderbook } from './components/Orderbook';
-import { TimeSince } from './components/TimeSince';
-import { AppFooter } from './components/Footer';
+import { Token } from '0x.js';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { TokenSelect } from './pages/TokenSelect';
+import { TokenPairOrderbook } from './pages/TokenPairOrderbook';
+import { Spinner } from './components/Spinner';
 import { TokenPair } from './types';
-const logo = require('./assets/icons/conduit-white.svg');
-const exchange = require('./assets/icons/exchange-black.svg');
 BigNumber.config({
   EXPONENTIAL_AT: 1000,
 });
@@ -28,8 +18,8 @@ export interface AppProps {
 export interface AppState {
   connectionStatus: 'connected' | 'disconnected' | 'loading';
   lastWebSocketUpdate?: Date;
-  tokens: Array<any>;
-  tokenPairs: Array<any>;
+  tokens: Array<Token>;
+  tokenPairs: Array<TokenPair>;
 }
 
 class App extends Component<AppProps | any, AppState> {
@@ -64,69 +54,76 @@ class App extends Component<AppProps | any, AppState> {
     return json;
   };
 
-  private getTokenFromSymbol = (symbol: string) => {
-    return this.state.tokens.find(t => t.symbol === symbol);
+  private getTokenFromSymbol = (symbol: string): Token => {
+    const token = this.state.tokens.find(t => t.symbol === symbol);
+    if (!token) {
+      throw new Error('Token not found');
+    }
+    return token;
   };
 
   private getBaseAndQuoteTokenFromTicker = (ticker: string) => {
     const tickerParts = ticker.split('-');
     const [baseTokenSymbol, quoteTokenSymbol] = tickerParts;
-    const baseToken = this.getTokenFromSymbol(baseTokenSymbol);
-    const quoteToken = this.getTokenFromSymbol(quoteTokenSymbol);
-    return {
-      baseToken,
-      quoteToken,
-    };
+    try {
+      const baseToken = this.getTokenFromSymbol(baseTokenSymbol);
+      const quoteToken = this.getTokenFromSymbol(quoteTokenSymbol);
+      return {
+        baseToken,
+        quoteToken,
+      };
+    } catch (e) {
+      console.error(e);
+      return {
+        baseToken: null,
+        quoteToken: null,
+      };
+    }
   };
 
   render() {
     const { wsEndpoint } = this.props;
-    const { lastWebSocketUpdate, connectionStatus, tokenPairs, tokens } = this.state;
+    const { tokenPairs, tokens } = this.state;
     const hasLoadedTokens: boolean = tokenPairs.length > 0 && tokens.length > 0;
+
+    if (!hasLoadedTokens) return <Spinner />;
+    // TODO, if you go directly to the orderbook page it crashes cuz it doesnt wait on hasLoadedTokens
     return (
       <Router>
-        <AppContainer>
-          <AppHeader title={'Conduit'} subtitle={'Open Source 0x Relayer'} logo={logo} />
-          {connectionStatus === 'disconnected' ? (
-            <ConnectionError />
-          ) : !hasLoadedTokens ? (
-            <LoadingScreen />
-          ) : (
-            <AppContent>
-              <Switch>
-                <Route
-                  path="/orderbook/:tokenPair"
-                  render={props => {
-                    const ticker = props.match.params.tokenPair;
-                    const { baseToken, quoteToken } = this.getBaseAndQuoteTokenFromTicker(ticker);
-                    return (
-                      <Orderbook
-                        baseToken={baseToken}
-                        quoteToken={quoteToken}
-                        wsEndpoint={wsEndpoint}
-                        {...props}
-                      />
-                    );
-                  }}
+        <Switch>
+          <Route
+            path="/orderbook/:tokenPair"
+            render={props => {
+              const ticker = props.match.params.tokenPair;
+              const { baseToken, quoteToken } = this.getBaseAndQuoteTokenFromTicker(ticker);
+              if (!baseToken || !quoteToken) {
+                return <Redirect to={'/'} />;
+              }
+              return (
+                <TokenPairOrderbook
+                  baseToken={baseToken}
+                  quoteToken={quoteToken}
+                  wsEndpoint={wsEndpoint}
+                  {...props}
                 />
-                <Route
-                  exact
-                  path="/"
-                  render={props => <Home tokenPairs={tokenPairs} {...props} />}
-                />
-              </Switch>
-            </AppContent>
-          )}
-          <AppFooter>
-            <TimeSince
-              date={lastWebSocketUpdate}
-              formatter={timeSince => (timeSince ? `Last updated ${timeSince}` : 'Disconnected')}
-            />
-          </AppFooter>
-        </AppContainer>
+              );
+            }}
+          />
+          <Route
+            exact
+            path="/"
+            render={props => <TokenSelect tokenPairs={tokenPairs} {...props} />}
+          />
+        </Switch>
       </Router>
     );
   }
 }
+
+// const CenterSpinner = styled.div`
+//   display: flex;
+//   align-items: center;
+//   flex: 1;
+// `;
 
 export default App;
