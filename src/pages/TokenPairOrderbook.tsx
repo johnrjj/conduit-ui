@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Component } from 'react';
 import styled from 'styled-components';
 import { BigNumber } from 'bignumber.js';
-import { ZeroEx, SignedOrder, Token } from '0x.js';
+import { ZeroEx, SignedOrder } from '0x.js';
 import { RBTree } from 'bintrees';
 import { NavLink } from 'react-router-dom';
 import { TradeTable } from '../components/TradeTable';
@@ -123,8 +123,7 @@ const OrderbookContainer = styled.div`
 
 export interface OrderbookProps {
   wsEndpoint: string;
-  selectedBaseToken: Token;
-  selectedQuoteToken: Token;
+  selectedTokenPair: FullTokenPairData;
   availableTokenPairs: Array<FullTokenPairData>;
 }
 
@@ -156,15 +155,17 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   componentDidMount() {
     this.feed &&
       this.feed.subscribeToOrderbook(
-        this.props.selectedBaseToken.address,
-        this.props.selectedQuoteToken.address
+        this.props.selectedTokenPair.baseToken.address,
+        this.props.selectedTokenPair.quoteToken.address
       );
   }
 
   componentWillReceiveProps(nextProps: OrderbookProps) {
     if (
-      nextProps.selectedBaseToken.address !== this.props.selectedBaseToken.address ||
-      nextProps.selectedQuoteToken.address !== this.props.selectedQuoteToken.address
+      nextProps.selectedTokenPair.baseToken.address !==
+        this.props.selectedTokenPair.baseToken.address ||
+      nextProps.selectedTokenPair.quoteToken.address !==
+        this.props.selectedTokenPair.quoteToken.address
     ) {
       console.log('new pair to look at, resetting state');
       this.setState({
@@ -176,8 +177,8 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
       });
       this.feed &&
         this.feed.subscribeToOrderbook(
-          nextProps.selectedBaseToken.address,
-          nextProps.selectedQuoteToken.address
+          nextProps.selectedTokenPair.baseToken.address,
+          nextProps.selectedTokenPair.quoteToken.address
         );
     }
   }
@@ -203,23 +204,15 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   };
 
   private addAskToOrderbook = (ask: SignedOrder) => {
-    const { selectedBaseToken, selectedQuoteToken } = this.props;
-    const orderDetail = this.computeOrderDetails(
-      ask,
-      selectedBaseToken.address,
-      selectedQuoteToken.address
-    );
+    const { baseToken, quoteToken } = this.props.selectedTokenPair;
+    const orderDetail = this.computeOrderDetails(ask, baseToken.address, quoteToken.address);
     this.addOrderDetails(ask, orderDetail);
     this.addAsk(ask);
   };
 
   private addBidToOrderbook = (bid: SignedOrder) => {
-    const { selectedBaseToken, selectedQuoteToken } = this.props;
-    const orderDetail = this.computeOrderDetails(
-      bid,
-      selectedBaseToken.address,
-      selectedQuoteToken.address
-    );
+    const { baseToken, quoteToken } = this.props.selectedTokenPair;
+    const orderDetail = this.computeOrderDetails(bid, baseToken.address, quoteToken.address);
     this.addOrderDetails(bid, orderDetail);
     this.addBid(bid);
   };
@@ -253,8 +246,8 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
     if (!data) {
       const orderDetail = this.computeOrderDetails(
         signedOrder,
-        this.props.selectedBaseToken.address,
-        this.props.selectedQuoteToken.address
+        this.props.selectedTokenPair.baseToken.address,
+        this.props.selectedTokenPair.quoteToken.address
       );
       this.addOrderDetails(signedOrder, orderDetail);
       data = orderDetail;
@@ -268,14 +261,14 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
     quoteTokenAddress: string
   ) {
     const makerToken =
-      this.props.selectedBaseToken.address === order.makerTokenAddress
-        ? this.props.selectedBaseToken
-        : this.props.selectedQuoteToken;
+      this.props.selectedTokenPair.baseToken.address === order.makerTokenAddress
+        ? this.props.selectedTokenPair.baseToken
+        : this.props.selectedTokenPair.quoteToken;
 
     const takerToken =
-      this.props.selectedBaseToken.address === order.takerTokenAddress
-        ? this.props.selectedBaseToken
-        : this.props.selectedQuoteToken;
+      this.props.selectedTokenPair.baseToken.address === order.takerTokenAddress
+        ? this.props.selectedTokenPair.baseToken
+        : this.props.selectedTokenPair.quoteToken;
 
     const makerUnitAmount = ZeroEx.toUnitAmount(
       new BigNumber(order.makerTokenAmount),
@@ -344,7 +337,9 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   render() {
     console.log(this.state);
 
-    const { wsEndpoint, selectedBaseToken, selectedQuoteToken, availableTokenPairs } = this.props;
+    const { wsEndpoint, selectedTokenPair, availableTokenPairs } = this.props;
+    const selectedBaseToken = selectedTokenPair.baseToken;
+    const selectedQuoteToken = selectedTokenPair.quoteToken;
     const { loading, asks, bids } = this.state;
 
     const currentTokenPair = availableTokenPairs.find(

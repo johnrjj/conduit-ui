@@ -6,7 +6,7 @@ export interface TokenPairPartial {
   maxAmount: string;
   minAmount: string;
   precision: number;
-  decimal: number;
+  decimals: number;
   name: string;
   symbol: string;
 }

@@ -40,13 +40,13 @@ const enhanceTokenPairData = (
   const baseToken = {
     symbol: baseTokenSymbol,
     name: baseTokenName,
-    decimal: foundBaseToken.decimals,
+    decimals: foundBaseToken.decimals,
     ...baseTokenData,
   };
   const quoteToken = {
     symbol: quoteTokenSymbol,
     name: quoteTokenName,
-    decimal: foundQuoteToken.decimals,
+    decimals: foundQuoteToken.decimals,
     ...quoteTokenData,
   };
 

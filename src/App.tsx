@@ -16,9 +16,8 @@ export interface AppProps {
   restEndpoint: string;
   wsEndpoint: string;
 }
+
 export interface AppState {
-  connectionStatus: 'connected' | 'disconnected' | 'loading';
-  lastWebSocketUpdate?: Date;
   tokens: Array<Token>;
   tokenPairs: Array<FullTokenPairData>;
 }
@@ -27,7 +26,6 @@ class App extends Component<AppProps | any, AppState> {
   constructor(props) {
     super(props);
     this.state = {
-      connectionStatus: 'loading',
       tokens: [],
       tokenPairs: [],
     };
@@ -41,7 +39,6 @@ class App extends Component<AppProps | any, AppState> {
       tokens,
       tokenPairs: fullTokenPairsData,
     });
-    this.setState({ lastWebSocketUpdate: new Date(), connectionStatus: 'connected' });
   }
 
   private fetchTokens = async (): Promise<Array<Token>> => {
@@ -56,40 +53,30 @@ class App extends Component<AppProps | any, AppState> {
     return json;
   };
 
-  private getTokenFromSymbol = (symbol: string): Token => {
-    const token = this.state.tokens.find(t => t.symbol === symbol);
-    if (!token) {
-      throw new Error('Token not found');
-    }
-    return token;
-  };
-
-  private getBaseAndQuoteTokenFromTicker = (ticker: string) => {
+  private getTokenPairFromTicker = (ticker: string) => {
     const tickerParts = ticker.split('-');
     const [baseTokenSymbol, quoteTokenSymbol] = tickerParts;
-    try {
-      const baseToken = this.getTokenFromSymbol(baseTokenSymbol);
-      const quoteToken = this.getTokenFromSymbol(quoteTokenSymbol);
-      return {
-        baseToken,
-        quoteToken,
-      };
-    } catch (e) {
-      console.error(e);
-      return {
-        baseToken: null,
-        quoteToken: null,
-      };
+    if (!baseTokenSymbol || !quoteTokenSymbol) {
+      throw new Error('Unrecognized ticker format, must be of format BASESYMBOL-QUOTESYMBOL');
     }
+    const tokenPair = this.state.tokenPairs.find(
+      tokenPair =>
+        tokenPair.baseToken.symbol === baseTokenSymbol &&
+        tokenPair.quoteToken.symbol === quoteTokenSymbol
+    );
+    if (!tokenPair) {
+      throw new Error(
+        `Could not find token pair ${baseTokenSymbol}-${quoteTokenSymbol} in available token pairs`
+      );
+    }
+    return tokenPair;
   };
 
   render() {
     const { wsEndpoint } = this.props;
     const { tokenPairs, tokens } = this.state;
-    const hasLoadedTokens: boolean = tokenPairs.length > 0 && tokens.length > 0;
-
+    const hasLoadedTokens = tokenPairs.length > 0 && tokens.length > 0;
     if (!hasLoadedTokens) return <Spinner />;
-
     return (
       <Router>
         <Switch>
@@ -97,19 +84,22 @@ class App extends Component<AppProps | any, AppState> {
             path="/orderbook/:tokenPair"
             render={props => {
               const ticker = props.match.params.tokenPair;
-              const { baseToken, quoteToken } = this.getBaseAndQuoteTokenFromTicker(ticker);
-              if (!baseToken || !quoteToken) {
+              try {
+                const tokenPair = this.getTokenPairFromTicker(ticker);
+                return (
+                  <TokenPairOrderbook
+                    selectedTokenPair={tokenPair}
+                    availableTokenPairs={tokenPairs}
+                    wsEndpoint={wsEndpoint}
+                    {...props}
+                  />
+                );
+              } catch (err) {
+                // user was linked to a nonexistant token pair
+                // todo, redirect to 404 and show human readable error
+                console.error(err);
                 return <Redirect to={'/'} />;
               }
-              return (
-                <TokenPairOrderbook
-                  selectedBaseToken={baseToken}
-                  selectedQuoteToken={quoteToken}
-                  availableTokenPairs={tokenPairs}
-                  wsEndpoint={wsEndpoint}
-                  {...props}
-                />
-              );
             }}
           />
           <Route
