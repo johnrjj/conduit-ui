@@ -8,7 +8,7 @@ const LeftNavContainer = styled.div`
   flex-basis: 16rem;
   max-width: 16rem;
   min-width: 12rem;
-  background-image: linear-gradient(-180deg, #25206b 0%, #5e4da3 50%);
+  background-image: linear-gradient(-180deg, #25206b 0%, #5e4da3 80%);
 `;
 
 const LeftNavHeader = styled.div`
@@ -18,8 +18,8 @@ const LeftNavHeader = styled.div`
   align-items: center;
   height: 4rem;
   min-height: 4rem;
-  margin: 0rem 2rem 3rem 20px;
-  // border-bottom: 1px solid #3D377F;
+  padding-bottom: 1rem;
+  margin: 0rem 1rem 3rem 20px;
 `;
 
 const LeftNavHeaderLogo = styled.img`

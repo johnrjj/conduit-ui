@@ -56,7 +56,6 @@ const HeaderTitle = styled.h1`
   letter-spacing: 0;
 `;
 
-
 const AllContentBelowHeader = styled.div`
   display: flex;
   flex: 1;
@@ -131,7 +130,7 @@ export interface OrderbookProps {
   wsEndpoint: string;
   baseToken: Token;
   quoteToken: Token;
-  availableTokenPairs: Array<FullTokenPairData>
+  availableTokenPairs: Array<FullTokenPairData>;
 }
 
 export interface OrderbookState {
@@ -145,7 +144,6 @@ export interface OrderbookState {
 export interface OrderDetails {
   price: BigNumber;
 }
-
 
 class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   feed: ZeroExFeed | null;
@@ -337,7 +335,7 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   render() {
     console.log(this.state);
 
-    const { wsEndpoint, baseToken, quoteToken } = this.props;
+    const { wsEndpoint, baseToken, quoteToken, availableTokenPairs } = this.props;
     const { loading, asks, bids } = this.state;
 
     if (!quoteToken || !baseToken) return <Spinner />;
@@ -368,21 +366,14 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
           </LeftNavHeader>
           <LeftNavSectionContainer>
             <LeftNavSectionTitle>Token Pairs</LeftNavSectionTitle>
-            <LeftNavListItem
-              to={'/orderbook/MKR-WETH'}
-              title={'MKR/ETH'}
-              subtitle={'Maker/Ethereum'}
-            />
-            <LeftNavListItem
-              to={'/orderbook/ZRX-WETH'}
-              title={'ZRX/ETH'}
-              subtitle={'ZeroEx/Ethereum'}
-            />
-            <LeftNavListItem
-              to={'/orderbook/DOESNOTEXIST'}
-              title={'NOPE/ETH'}
-              subtitle={'DNE/Ethereum'}
-            />
+
+            {availableTokenPairs.map(tokenPair => (
+              <LeftNavListItem
+                to={`/orderbook/${tokenPair.baseToken.symbol}-${tokenPair.quoteToken.symbol}`}
+                title={tokenPair.symbolTicker}
+                subtitle={tokenPair.nameTicker}
+              />
+            ))}
           </LeftNavSectionContainer>
         </LeftNavContainer>
         <AsksAndBidsTablesContainer>

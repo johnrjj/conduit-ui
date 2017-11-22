@@ -126,7 +126,7 @@ const TokenNameTicker = styled.p`
 //   return `${baseTokenSymbol}/${quoteTokenSymbol}`;
 // };
 
-const TokenPairSelect = ({tokenPair} : { tokenPair: FullTokenPairData}) => {
+const TokenPairSelect = ({ tokenPair }: { tokenPair: FullTokenPairData }) => {
   const { baseToken, quoteToken, nameTicker, symbolTicker } = tokenPair;
   return (
     <Link to={`orderbook/${baseToken.symbol}-${quoteToken.symbol}`}>

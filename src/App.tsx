@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-d
 import { TokenSelect } from './pages/TokenSelect';
 import { TokenPairOrderbook } from './pages/TokenPairOrderbook';
 import { Spinner } from './components/Spinner';
-import { enhanceTokenPairData } from './util/token'
+import { enhanceTokenPairData } from './util/token';
 import { TokenPairFromApi } from './types';
 BigNumber.config({
   EXPONENTIAL_AT: 1000,
@@ -89,11 +89,9 @@ class App extends Component<AppProps | any, AppState> {
 
     if (!hasLoadedTokens) return <Spinner />;
 
-
-
-
-
-    const tokenPairsFullMetadata = tokenPairs.map(tokenPair => enhanceTokenPairData(tokenPair, tokens));
+    const tokenPairsFullMetadata = tokenPairs.map(tokenPair =>
+      enhanceTokenPairData(tokenPair, tokens)
+    );
     console.log(tokenPairsFullMetadata);
     // TODO, if you go directly to the orderbook page it crashes cuz it doesnt wait on hasLoadedTokens
     return (
@@ -128,8 +126,6 @@ class App extends Component<AppProps | any, AppState> {
     );
   }
 }
-
-
 
 // const CenterSpinner = styled.div`
 //   display: flex;
