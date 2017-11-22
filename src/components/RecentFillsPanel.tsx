@@ -5,7 +5,7 @@ import sizing from '../util/sizing';
 
 const SIDE_PANEL_HEADER_HEIGHT = '4rem';
 
-const SidePanelContainer = styled.aside`
+const SidePanel = styled.aside`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -19,12 +19,16 @@ const SidePanelContainer = styled.aside`
   }
 `;
 
-const SidePanel = styled.div`
+const SidePanelContent = styled.div`
   position: absolute;
   top: ${SIDE_PANEL_HEADER_HEIGHT};
   bottom: 0;
   left: 0;
   right: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  flex: 1;
   overflow-y: scroll;
 `;
 
@@ -46,13 +50,6 @@ const SidePanelHeader = styled.div`
   font-weight: 500;
 `;
 
-const SidePanelContent = styled.ul`
-  display: flex;
-  flex-wrap: nowrap;
-  flex-direction: column;
-  flex: 1;
-`;
-
 const SidePanelListItem = styled.li`
   display: flex;
   flex-direction: row;
@@ -60,7 +57,7 @@ const SidePanelListItem = styled.li`
   height: 3rem;
   min-height: 3rem;
   font-weight: 100;
-  // border-bottom: 1px solid ${colors.greyBorder};
+  padding-left: 2rem;
 `;
 
 const SidePanelListItemMaker = styled.div`
@@ -90,10 +87,9 @@ const SidePanelListItemSwapIcon = () => (
 );
 
 export {
-  SidePanelContainer,
   SidePanel,
-  SidePanelHeader,
   SidePanelContent,
+  SidePanelHeader,
   SidePanelListItem,
   SidePanelListItemMaker,
   SidePanelListItemTaker,

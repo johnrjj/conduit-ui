@@ -2,8 +2,6 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { FullTokenPairData } from '../types';
-// import colors from '../util/colors';
-// import sizing from '../util/sizing';
 const logo = require('../assets/icons/conduit-white.svg');
 
 const FullScreen = styled.div`
@@ -102,29 +100,6 @@ const TokenNameTicker = styled.p`
   color: rgba(51, 54, 73, 0.55);
   font-size: 1rem;
 `;
-
-// const destructureTokenPair = (tokenPair: TokenPairFromApi) => {
-//   const [baseTokenSymbol, quoteTokenSymbol] = Object.keys(tokenPair);
-//   const values = Object.keys(tokenPair).map(k => tokenPair[k]);
-//   const [baseTokenData, quoteTokenData] = values;
-//   const baseToken = {
-//     symbol: baseTokenSymbol,
-//     ...baseTokenData,
-//   };
-//   const quoteToken = {
-//     symbol: quoteTokenSymbol,
-//     ...quoteTokenData,
-//   };
-//   return {
-//     baseToken,
-//     quoteToken,
-//   };
-// };
-
-// const getTokenPairTicker = (tokenPair: TokenPairFromApi) => {
-//   const [baseTokenSymbol, quoteTokenSymbol] = Object.keys(tokenPair);
-//   return `${baseTokenSymbol}/${quoteTokenSymbol}`;
-// };
 
 const TokenPairSelect = ({ tokenPair }: { tokenPair: FullTokenPairData }) => {
   const { baseToken, quoteToken, nameTicker, symbolTicker } = tokenPair;

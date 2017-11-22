@@ -7,7 +7,6 @@ import { RBTree } from 'bintrees';
 import { NavLink } from 'react-router-dom';
 import { TradeTable } from '../components/TradeTable';
 import { ZeroExFeed, OrderbookSnapshot } from '../components/ZeroExFeed';
-import { Spinner } from '../components/Spinner';
 import {
   LeftNavContainer,
   LeftNavHeader,
@@ -18,14 +17,10 @@ import {
   LeftNavListItem,
 } from '../components/NavPanel';
 import {
-  SidePanelContainer,
   SidePanel,
-  SidePanelHeader,
   SidePanelContent,
+  SidePanelHeader,
   SidePanelListItem,
-  SidePanelListItemMaker,
-  SidePanelListItemTaker,
-  SidePanelListItemSwapIcon,
 } from '../components/RecentFillsPanel';
 import sizing from '../util/sizing';
 import colors from '../util/colors';
@@ -38,7 +33,7 @@ const AppContent = styled.div`
   height: 100%;
 `;
 
-const HeaderBar = styled.div`
+const OrderbookHeader = styled.div`
   height: 4rem;
   padding-left: 4rem;
   background: #ffffff;
@@ -49,19 +44,19 @@ const HeaderBar = styled.div`
   }
 `;
 
-const HeaderTitle = styled.h1`
+const OrderbookHeaderTitle = styled.h1`
   font-size: 1.5rem;
   font-weight: 700;
   color: #33354a;
   letter-spacing: 0;
 `;
 
-const AllContentBelowHeader = styled.div`
+const OrderbookContent = styled.div`
   display: flex;
   flex: 1;
 `;
 
-const MainPanel = styled.section`
+const ContentPanel = styled.section`
   display: flex;
   flex: 1;
   flex-basis: 40rem;
@@ -73,7 +68,7 @@ const MainPanel = styled.section`
   }
 `;
 
-const MainPanelHeader = styled.h1`
+const MarketSummary = styled.h1`
   display: flex;
   flex-direction: row;
   flex: 1;
@@ -119,7 +114,7 @@ const BidTableContainer = styled.div`
   box-shadow: 0 2px 4px 0 rgba(36, 48, 86, 0.2);
 `;
 
-const AsksAndBidsTablesContainer = styled.div`
+const OrderbookContainer = styled.div`
   display: flex;
   height: 100%;
   flex: 1;
@@ -128,8 +123,8 @@ const AsksAndBidsTablesContainer = styled.div`
 
 export interface OrderbookProps {
   wsEndpoint: string;
-  baseToken: Token;
-  quoteToken: Token;
+  selectedBaseToken: Token;
+  selectedQuoteToken: Token;
   availableTokenPairs: Array<FullTokenPairData>;
 }
 
@@ -160,13 +155,16 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
 
   componentDidMount() {
     this.feed &&
-      this.feed.subscribeToOrderbook(this.props.baseToken.address, this.props.quoteToken.address);
+      this.feed.subscribeToOrderbook(
+        this.props.selectedBaseToken.address,
+        this.props.selectedQuoteToken.address
+      );
   }
 
   componentWillReceiveProps(nextProps: OrderbookProps) {
     if (
-      nextProps.baseToken.address !== this.props.baseToken.address ||
-      nextProps.quoteToken.address !== this.props.quoteToken.address
+      nextProps.selectedBaseToken.address !== this.props.selectedBaseToken.address ||
+      nextProps.selectedQuoteToken.address !== this.props.selectedQuoteToken.address
     ) {
       console.log('new pair to look at, resetting state');
       this.setState({
@@ -177,7 +175,10 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
         loading: true,
       });
       this.feed &&
-        this.feed.subscribeToOrderbook(nextProps.baseToken.address, nextProps.quoteToken.address);
+        this.feed.subscribeToOrderbook(
+          nextProps.selectedBaseToken.address,
+          nextProps.selectedQuoteToken.address
+        );
     }
   }
 
@@ -202,15 +203,23 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   };
 
   private addAskToOrderbook = (ask: SignedOrder) => {
-    const { baseToken, quoteToken } = this.props;
-    const orderDetail = this.computeOrderDetails(ask, baseToken.address, quoteToken.address);
+    const { selectedBaseToken, selectedQuoteToken } = this.props;
+    const orderDetail = this.computeOrderDetails(
+      ask,
+      selectedBaseToken.address,
+      selectedQuoteToken.address
+    );
     this.addOrderDetails(ask, orderDetail);
     this.addAsk(ask);
   };
 
   private addBidToOrderbook = (bid: SignedOrder) => {
-    const { baseToken, quoteToken } = this.props;
-    const orderDetail = this.computeOrderDetails(bid, baseToken.address, quoteToken.address);
+    const { selectedBaseToken, selectedQuoteToken } = this.props;
+    const orderDetail = this.computeOrderDetails(
+      bid,
+      selectedBaseToken.address,
+      selectedQuoteToken.address
+    );
     this.addOrderDetails(bid, orderDetail);
     this.addBid(bid);
   };
@@ -244,8 +253,8 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
     if (!data) {
       const orderDetail = this.computeOrderDetails(
         signedOrder,
-        this.props.baseToken.address,
-        this.props.quoteToken.address
+        this.props.selectedBaseToken.address,
+        this.props.selectedQuoteToken.address
       );
       this.addOrderDetails(signedOrder, orderDetail);
       data = orderDetail;
@@ -259,14 +268,14 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
     quoteTokenAddress: string
   ) {
     const makerToken =
-      this.props.baseToken.address === order.makerTokenAddress
-        ? this.props.baseToken
-        : this.props.quoteToken;
+      this.props.selectedBaseToken.address === order.makerTokenAddress
+        ? this.props.selectedBaseToken
+        : this.props.selectedQuoteToken;
 
     const takerToken =
-      this.props.baseToken.address === order.takerTokenAddress
-        ? this.props.baseToken
-        : this.props.quoteToken;
+      this.props.selectedBaseToken.address === order.takerTokenAddress
+        ? this.props.selectedBaseToken
+        : this.props.selectedQuoteToken;
 
     const makerUnitAmount = ZeroEx.toUnitAmount(
       new BigNumber(order.makerTokenAmount),
@@ -335,10 +344,14 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   render() {
     console.log(this.state);
 
-    const { wsEndpoint, baseToken, quoteToken, availableTokenPairs } = this.props;
+    const { wsEndpoint, selectedBaseToken, selectedQuoteToken, availableTokenPairs } = this.props;
     const { loading, asks, bids } = this.state;
 
-    if (!quoteToken || !baseToken) return <Spinner />;
+    const currentTokenPair = availableTokenPairs.find(
+      tokenPair =>
+        tokenPair.baseToken.address === selectedBaseToken.address &&
+        tokenPair.quoteToken.address === selectedQuoteToken.address
+    );
 
     const asksInOrder = this.RBTreeToArray(asks);
     const bidsInOrder = this.RBTreeToArray(bids);
@@ -366,7 +379,6 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
           </LeftNavHeader>
           <LeftNavSectionContainer>
             <LeftNavSectionTitle>Token Pairs</LeftNavSectionTitle>
-
             {availableTokenPairs.map(tokenPair => (
               <LeftNavListItem
                 to={`/orderbook/${tokenPair.baseToken.symbol}-${tokenPair.quoteToken.symbol}`}
@@ -376,19 +388,22 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
             ))}
           </LeftNavSectionContainer>
         </LeftNavContainer>
-        <AsksAndBidsTablesContainer>
-          <HeaderBar>
-            <HeaderTitle>Maker / Ethereum</HeaderTitle>
-          </HeaderBar>
-          <AllContentBelowHeader>
-            <MainPanel>
-              <MainPanelHeader>{midMarketPrice}</MainPanelHeader>
+        <OrderbookContainer>
+          <OrderbookHeader>
+            <OrderbookHeaderTitle>
+              {(currentTokenPair && currentTokenPair.nameTicker) ||
+                `${selectedBaseToken.name}/${selectedQuoteToken.name}`}
+            </OrderbookHeaderTitle>
+          </OrderbookHeader>
+          <OrderbookContent>
+            <ContentPanel>
+              <MarketSummary>{midMarketPrice}</MarketSummary>
               <BidsAndAsksTablesContainer>
                 <AskTableContainer>
                   <TradeTable
                     headerTitle={'Asks'}
-                    baseTokenSymbol={baseToken.symbol}
-                    quoteTokenSymbol={quoteToken.symbol}
+                    baseTokenSymbol={selectedBaseToken.symbol}
+                    quoteTokenSymbol={selectedQuoteToken.symbol}
                     data={asksInOrder}
                     loading={loading}
                     noOrdersText={'No asks found'}
@@ -397,44 +412,23 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
                 <BidTableContainer>
                   <TradeTable
                     headerTitle={'Bids'}
-                    baseTokenSymbol={baseToken.symbol}
-                    quoteTokenSymbol={quoteToken.symbol}
+                    baseTokenSymbol={selectedBaseToken.symbol}
+                    quoteTokenSymbol={selectedQuoteToken.symbol}
                     data={bidsInOrder}
                     loading={loading}
                     noOrdersText={'No bids found'}
                   />
                 </BidTableContainer>
               </BidsAndAsksTablesContainer>
-            </MainPanel>
-            <SidePanelContainer>
+            </ContentPanel>
+            <SidePanel>
               <SidePanelHeader>Recent fills</SidePanelHeader>
-              <SidePanel>
-                <SidePanelContent>
-                  <SidePanelListItem>
-                    <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                    <SidePanelListItemSwapIcon />
-                    <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                  </SidePanelListItem>
-                  <SidePanelListItem>
-                    <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                    <SidePanelListItemSwapIcon />
-                    <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                  </SidePanelListItem>{' '}
-                  <SidePanelListItem>
-                    <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                    <SidePanelListItemSwapIcon />
-                    <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                  </SidePanelListItem>{' '}
-                  <SidePanelListItem>
-                    <SidePanelListItemMaker>1000040 MKR</SidePanelListItemMaker>
-                    <SidePanelListItemSwapIcon />
-                    <SidePanelListItemTaker>0.1219921 ZRX</SidePanelListItemTaker>
-                  </SidePanelListItem>{' '}
-                </SidePanelContent>
-              </SidePanel>
-            </SidePanelContainer>
-          </AllContentBelowHeader>
-        </AsksAndBidsTablesContainer>
+              <SidePanelContent>
+                <SidePanelListItem>No recent fills</SidePanelListItem>
+              </SidePanelContent>
+            </SidePanel>
+          </OrderbookContent>
+        </OrderbookContainer>
       </AppContent>
     );
   }

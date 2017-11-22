@@ -18,7 +18,6 @@ const LeftNavHeader = styled.div`
   align-items: center;
   height: 4rem;
   min-height: 4rem;
-  padding-bottom: 1rem;
   margin: 0rem 1rem 3rem 20px;
 `;
 

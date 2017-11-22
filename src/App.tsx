@@ -7,7 +7,7 @@ import { TokenSelect } from './pages/TokenSelect';
 import { TokenPairOrderbook } from './pages/TokenPairOrderbook';
 import { Spinner } from './components/Spinner';
 import { enhanceTokenPairData } from './util/token';
-import { TokenPairFromApi } from './types';
+import { TokenPairFromApi, FullTokenPairData } from './types';
 BigNumber.config({
   EXPONENTIAL_AT: 1000,
 });
@@ -20,7 +20,7 @@ export interface AppState {
   connectionStatus: 'connected' | 'disconnected' | 'loading';
   lastWebSocketUpdate?: Date;
   tokens: Array<Token>;
-  tokenPairs: Array<TokenPairFromApi>;
+  tokenPairs: Array<FullTokenPairData>;
 }
 
 class App extends Component<AppProps | any, AppState> {
@@ -36,9 +36,10 @@ class App extends Component<AppProps | any, AppState> {
   async componentDidMount() {
     const tokens = await this.fetchTokens();
     const tokenPairs = await this.fetchTokenPairs();
+    const fullTokenPairsData = tokenPairs.map(tokenPair => enhanceTokenPairData(tokenPair, tokens));
     this.setState({
       tokens,
-      tokenPairs,
+      tokenPairs: fullTokenPairsData,
     });
     this.setState({ lastWebSocketUpdate: new Date(), connectionStatus: 'connected' });
   }
@@ -89,11 +90,6 @@ class App extends Component<AppProps | any, AppState> {
 
     if (!hasLoadedTokens) return <Spinner />;
 
-    const tokenPairsFullMetadata = tokenPairs.map(tokenPair =>
-      enhanceTokenPairData(tokenPair, tokens)
-    );
-    console.log(tokenPairsFullMetadata);
-    // TODO, if you go directly to the orderbook page it crashes cuz it doesnt wait on hasLoadedTokens
     return (
       <Router>
         <Switch>
@@ -107,10 +103,10 @@ class App extends Component<AppProps | any, AppState> {
               }
               return (
                 <TokenPairOrderbook
-                  baseToken={baseToken}
-                  quoteToken={quoteToken}
+                  selectedBaseToken={baseToken}
+                  selectedQuoteToken={quoteToken}
+                  availableTokenPairs={tokenPairs}
                   wsEndpoint={wsEndpoint}
-                  availableTokenPairs={tokenPairsFullMetadata}
                   {...props}
                 />
               );
@@ -119,18 +115,12 @@ class App extends Component<AppProps | any, AppState> {
           <Route
             exact
             path="/"
-            render={props => <TokenSelect tokenPairs={tokenPairsFullMetadata} {...props} />}
+            render={props => <TokenSelect tokenPairs={tokenPairs} {...props} />}
           />
         </Switch>
       </Router>
     );
   }
 }
-
-// const CenterSpinner = styled.div`
-//   display: flex;
-//   align-items: center;
-//   flex: 1;
-// `;
 
 export default App;
