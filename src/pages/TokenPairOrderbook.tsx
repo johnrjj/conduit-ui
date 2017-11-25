@@ -22,8 +22,9 @@ import {
   SidePanelHeader,
   SidePanelListItem,
 } from '../components/RecentFillsPanel';
+import { OrderbookSummary, OrderbookSummaryItem } from '../components/OrderbookSummary';
 import sizing from '../util/sizing';
-import colors from '../util/colors';
+// import colors from '../util/colors';
 import { FullTokenPairData, SignedOrderWithMetadata } from '../types';
 const logo = require('../assets/icons/conduit-white.svg');
 
@@ -68,22 +69,6 @@ const ContentPanel = styled.section`
   }
 `;
 
-const MarketSummary = styled.h1`
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-  flex-shrink: 0;
-  flex-basis: 6rem;
-  height: 6rem;
-  max-height: 6rem;
-  align-items: center;
-  padding-top: 0;
-  font-size: 2rem;
-  font-weight: 300;
-  letter-spacing: 0.5px;
-  color: ${colors.darkBlue};
-`;
-
 const BidsAndAsksTablesContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -120,8 +105,6 @@ const OrderbookContainer = styled.div`
   flex: 1;
   flex-direction: column;
 `;
-
-
 
 export interface OrderbookProps {
   wsEndpoint: string;
@@ -200,13 +183,21 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
 
   private addAskToOrderbook = (ask: SignedOrder) => {
     const { baseToken, quoteToken } = this.props.selectedTokenPair;
-    const askWithMetadata = this.addMetadataToSignedOrder(ask, baseToken.address, quoteToken.address);
+    const askWithMetadata = this.addMetadataToSignedOrder(
+      ask,
+      baseToken.address,
+      quoteToken.address
+    );
     this.addAsk(askWithMetadata);
   };
 
   private addBidToOrderbook = (bid: SignedOrder) => {
     const { baseToken, quoteToken } = this.props.selectedTokenPair;
-    const bidWithMetadata = this.addMetadataToSignedOrder(bid, baseToken.address, quoteToken.address);
+    const bidWithMetadata = this.addMetadataToSignedOrder(
+      bid,
+      baseToken.address,
+      quoteToken.address
+    );
     this.addBid(bidWithMetadata);
   };
 
@@ -285,15 +276,16 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
     return this.sortOrdersAsc(b, a);
   };
 
-  private getMidMarketPrice = (bids: RBTree<SignedOrderWithMetadata>, asks: RBTree<SignedOrderWithMetadata>): BigNumber => {
+  private getMidMarketPrice = (
+    bids: RBTree<SignedOrderWithMetadata>,
+    asks: RBTree<SignedOrderWithMetadata>
+  ): BigNumber => {
     // Bids and asks currently exist
     if (bids && bids.size > 0 && asks && asks.size > 0) {
       const currentHighestBid = bids.min(); // note, min heap, min accessor gets highest mid (the way its sorted)
       const currentLowestAsk = asks.min(); // note, min heap, min accessor gets lowest ask (the way its sorted)
       console.log(currentHighestBid.price, currentLowestAsk.price);
-      const midMarketPrice = currentHighestBid.price
-        .plus(currentLowestAsk.price)
-        .div(2);
+      const midMarketPrice = currentHighestBid.price.plus(currentLowestAsk.price).div(2);
       return midMarketPrice;
     }
     // No bids exist, use ask price
@@ -315,14 +307,15 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   }
 
   render() {
-    console.log(this.state);
-
     const { wsEndpoint, selectedTokenPair, availableTokenPairs } = this.props;
     const { baseToken: selectedBaseToken, quoteToken: selectedQuoteToken } = selectedTokenPair;
     const { loading, asks, bids } = this.state;
 
     const asksSorted = this.RBTreeToArray(asks);
+    const askPrice = (asksSorted[0] && asksSorted[0].price.toFixed(5)) || 'No asks';
+
     const bidsSorted = this.RBTreeToArray(bids);
+    const bidPrice = (bidsSorted[0] && bidsSorted[0].price.toFixed(5)) || 'No bids';
     const midMarketPrice = this.getMidMarketPrice(bids, asks).toFixed(5);
 
     return (
@@ -349,6 +342,7 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
             <LeftNavSectionTitle>Token Pairs</LeftNavSectionTitle>
             {availableTokenPairs.map(tokenPair => (
               <LeftNavListItem
+                key={tokenPair.symbolTicker}
                 to={`/orderbook/${tokenPair.baseToken.symbol}-${tokenPair.quoteToken.symbol}`}
                 title={tokenPair.symbolTicker}
                 subtitle={tokenPair.nameTicker}
@@ -358,13 +352,15 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
         </LeftNavContainer>
         <OrderbookContainer>
           <OrderbookHeader>
-            <OrderbookHeaderTitle>
-              {(selectedTokenPair.nameTicker)}
-            </OrderbookHeaderTitle>
+            <OrderbookHeaderTitle>{selectedTokenPair.nameTicker}</OrderbookHeaderTitle>
           </OrderbookHeader>
           <OrderbookContent>
             <ContentPanel>
-              <MarketSummary>{midMarketPrice} {selectedQuoteToken.symbol}</MarketSummary>
+              <OrderbookSummary>
+                <OrderbookSummaryItem title={midMarketPrice} subtitle={'Mid Market Price'} />
+                <OrderbookSummaryItem title={askPrice} subtitle={'Ask Price'} />
+                <OrderbookSummaryItem title={bidPrice} subtitle={'Bid Price'} />
+              </OrderbookSummary>
               <BidsAndAsksTablesContainer>
                 <AskTableContainer>
                   <TradeTable

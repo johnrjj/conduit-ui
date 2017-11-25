@@ -5,12 +5,12 @@ import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 
 const API_ENDPOINT_ROOT =
-  process.env.NODE_ENV === '!development'
+  process.env.NODE_ENV === 'development'
     ? 'http://localhost:3001/api/v0'
     : 'https://conduit-relay.herokuapp.com/api/v0';
 
 const WS_ENDPOINT =
-  process.env.NODE_ENV === '!development'
+  process.env.NODE_ENV === 'development'
     ? 'ws://localhost:3001/ws'
     : 'wss://conduit-relay.herokuapp.com/ws';
 
