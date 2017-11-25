@@ -10,7 +10,7 @@ const FullScreen = styled.div`
   flex-direction: column;
   width: 100%;
   min-height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   background-image: linear-gradient(-180deg, #25206b 0%, #5e4da3 99%);
 `;
 

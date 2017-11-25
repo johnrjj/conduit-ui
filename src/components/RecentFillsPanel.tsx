@@ -29,7 +29,7 @@ const SidePanelContent = styled.div`
   flex-wrap: nowrap;
   flex-direction: column;
   flex: 1;
-  overflow-y: scroll;
+  overflow-y: auto;
 `;
 
 const SidePanelHeader = styled.div`
