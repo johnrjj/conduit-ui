@@ -82,7 +82,16 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Futura', Arial, sans-serif;
+	font-family: 'Futura',
+		-apple-system,
+		BlinkMacSystemFont,
+		"Segoe UI",
+		Roboto,
+		Oxygen-Sans,
+		Ubuntu,
+		Cantarell,
+		"Helvetica Neue",
+		sans-serif;
   position: relative;
   height: 100%;
   width: 100%;
@@ -105,4 +114,12 @@ a {
 
 *, *:before, *:after {
   box-sizing: inherit;
+}
+
+.ReactTable .rt-th, .ReactTable .rt-td {
+	text-align: right;
+}
+
+.ReactTable .rt-thead.-headerGroups .rt-th {
+	text-align: center;
 }

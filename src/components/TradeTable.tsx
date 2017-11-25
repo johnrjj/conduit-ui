@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { SignedOrder } from '0x.js';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
+import { SignedOrderWithMetadata } from '../types';
 
 export interface TradeTableProps {
-  data: Array<SignedOrder>;
+  data: Array<SignedOrderWithMetadata>;
   headerTitle: string;
   noOrdersText: string;
   baseTokenSymbol: string;
@@ -36,17 +36,17 @@ export class TradeTable extends React.Component<TradeTableProps, any> {
                 {
                   Header: 'Price',
                   id: 'price',
-                  accessor: d => d.makerTokenAmount,
+                  accessor: d => d && (d as SignedOrderWithMetadata).price.toFixed(10),
                 },
                 {
                   Header: baseTokenSymbol,
                   id: 'baseTokenAmount',
-                  accessor: d => d.makerTokenAmount,
+                  accessor: d => d && (d as SignedOrderWithMetadata).baseUnitAmount.toFixed(10),
                 },
                 {
                   Header: quoteTokenSymbol,
                   id: 'quoteTokenAmount',
-                  accessor: d => d.takerTokenAmount,
+                  accessor: d => d && (d as SignedOrderWithMetadata).quoteUnitAmount.toFixed(10),
                 },
               ],
             },

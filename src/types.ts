@@ -1,5 +1,5 @@
 import { BigNumber } from 'bignumber.js';
-
+import { SignedOrder } from '0x.js';
 
 export interface TokenPairPartial {
   address: string;
@@ -29,6 +29,8 @@ export interface TokenPairFromApi {
 
 export interface Token {}
 
-export interface OrderDetails {
+export interface SignedOrderWithMetadata extends SignedOrder {
   price: BigNumber;
+  baseUnitAmount: BigNumber,
+  quoteUnitAmount: BigNumber,
 }
