@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "0x.js": "^0.22.4",
+    "@0xproject/connect": "^0.2.0",
     "@types/react-router": "^4.0.17",
     "bignumber.js": "^4.1.0",
     "bintrees": "^1.0.2",
@@ -15,7 +16,8 @@
     "react-router-dom": "^4.2.2",
     "react-scripts-ts": "^2.8.0",
     "react-table": "^6.7.4",
-    "styled-components": "^2.2.1"
+    "styled-components": "^2.2.1",
+    "websocket": "^1.0.25"
   },
   "scripts": {
     "start": "react-scripts-ts start",

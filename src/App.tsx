@@ -73,7 +73,7 @@ class App extends Component<AppProps | any, AppState> {
   };
 
   render() {
-    const { wsEndpoint } = this.props;
+    const { wsEndpoint, restEndpoint } = this.props;
     const { tokenPairs, tokens } = this.state;
     const hasLoadedTokens = tokenPairs.length > 0 && tokens.length > 0;
     if (!hasLoadedTokens) return <Spinner />;
@@ -91,6 +91,7 @@ class App extends Component<AppProps | any, AppState> {
                     selectedTokenPair={tokenPair}
                     availableTokenPairs={tokenPairs}
                     wsEndpoint={wsEndpoint}
+                    restEndpoint={restEndpoint}
                     {...props}
                   />
                 );

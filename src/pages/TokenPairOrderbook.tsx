@@ -6,7 +6,7 @@ import { ZeroEx, SignedOrder } from '0x.js';
 import { RBTree } from 'bintrees';
 import { NavLink } from 'react-router-dom';
 import { TradeTable } from '../components/TradeTable';
-import { ZeroExFeed, OrderbookSnapshot } from '../components/ZeroExFeed';
+import { ZeroExFeed } from '../components/ZeroExFeed';
 import {
   LeftNavContainer,
   LeftNavHeader,
@@ -26,6 +26,9 @@ import { OrderbookSummary, OrderbookSummaryItem } from '../components/OrderbookS
 import sizing from '../util/sizing';
 // import colors from '../util/colors';
 import { FullTokenPairData, SignedOrderWithMetadata } from '../types';
+// import { OrderbookChannel } from '@0xproject/connect/src/types';
+import { OrderbookResponse } from '@0xproject/connect';
+import { OrderbookChannel, OrderbookChannelSubscriptionOpts } from '@0xproject/connect/lib/src/types';
 const logo = require('../assets/icons/conduit-white.svg');
 
 const AppContent = styled.div`
@@ -108,6 +111,7 @@ const OrderbookContainer = styled.div`
 
 export interface OrderbookProps {
   wsEndpoint: string;
+  restEndpoint: string;
   selectedTokenPair: FullTokenPairData;
   availableTokenPairs: Array<FullTokenPairData>;
 }
@@ -132,11 +136,9 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   }
 
   componentDidMount() {
-    this.feed &&
-      this.feed.subscribeToOrderbook(
-        this.props.selectedTokenPair.baseToken.address,
-        this.props.selectedTokenPair.quoteToken.address
-      );
+    const baseTokenAddress = this.props.selectedTokenPair.baseToken.address;
+    const quoteTokenAddress = this.props.selectedTokenPair.quoteToken.address;
+    this.subscribeToOrderbook({ baseTokenAddress, quoteTokenAddress, snapshot: true, limit: 100 });    
   }
 
   componentWillReceiveProps(nextProps: OrderbookProps) {
@@ -154,25 +156,33 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
         recentFills: [],
         loading: true,
       });
-      this.feed &&
-        this.feed.subscribeToOrderbook(
-          nextProps.selectedTokenPair.baseToken.address,
-          nextProps.selectedTokenPair.quoteToken.address
-        );
+      const baseTokenAddress = nextProps.selectedTokenPair.baseToken.address;
+      const quoteTokenAddress = nextProps.selectedTokenPair.quoteToken.address;
+
+      this.subscribeToOrderbook({ baseTokenAddress, quoteTokenAddress, snapshot: true, limit: 100 });
     }
+  }
+
+  private subscribeToOrderbook({ baseTokenAddress, quoteTokenAddress, snapshot, limit }) {
+    return this.feed && this.feed.subscribeToOrderbook({
+      baseTokenAddress,
+      quoteTokenAddress,
+      snapshot,
+      limit,
+    });
   }
 
   handleSocketMessage = (_: MessageEvent) => {};
 
-  handleOrderbookUpdate(orderbookUpdate) {
-    console.log(orderbookUpdate);
+  handleOrderbookUpdate(channel: OrderbookChannel, subscriptionOpts: OrderbookChannelSubscriptionOpts, order: SignedOrder) {
+    console.log(channel);
   }
 
   handleOrderbookFill(fill) {
     console.log(fill);
   }
 
-  handleOrderbookSnapshot = (snapshot: OrderbookSnapshot) => {
+  handleOrderbookSnapshot = (channel: OrderbookChannel, subscriptionOpts: OrderbookChannelSubscriptionOpts, snapshot: OrderbookResponse) => {
     const { bids, asks } = snapshot;
     bids.forEach(this.addBidToOrderbook);
     asks.forEach(this.addAskToOrderbook);
@@ -307,7 +317,7 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
   }
 
   render() {
-    const { wsEndpoint, selectedTokenPair, availableTokenPairs } = this.props;
+    const { wsEndpoint, restEndpoint, selectedTokenPair, availableTokenPairs } = this.props;
     const { baseToken: selectedBaseToken, quoteToken: selectedQuoteToken } = selectedTokenPair;
     const { loading, asks, bids } = this.state;
 
@@ -322,11 +332,11 @@ class TokenPairOrderbook extends Component<OrderbookProps, OrderbookState> {
       <AppContent>
         <ZeroExFeed
           ref={ref => (this.feed = ref)}
-          url={wsEndpoint}
-          onMessage={this.handleSocketMessage}
-          onOrderbookSnapshot={this.handleOrderbookSnapshot}
-          onOrderbookUpdate={this.handleOrderbookUpdate}
-          onOrderbookFill={this.handleOrderbookFill}
+          wsEndpoint={wsEndpoint}
+          restEndpoint={restEndpoint}
+          onSnapshot={this.handleOrderbookSnapshot}
+          onUpdate={this.handleOrderbookUpdate}
+          onError={((channel, err) => console.log(err))}
           onClose={() => {}}
         />
         <LeftNavContainer>
