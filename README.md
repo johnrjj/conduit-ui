@@ -3,7 +3,7 @@
 [![CircleCI](https://circleci.com/gh/johnrjj/conduit-ui.svg?style=svg)](https://circleci.com/gh/johnrjj/conduit-ui/)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-[Demo](https://conduit-ui.surge.sh)
+This is a supporting frontend for [Conduit](https://github.com/johnrjj/conduit) (or really any 0x Relayer)
 
 ## Overview
 
